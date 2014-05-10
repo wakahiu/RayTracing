@@ -15,5 +15,7 @@ import ray.sampling.SampleGenerator;
 
 public interface Renderer {
 
+	boolean usesPhotons();
 	void rayRadiance(Scene scene, Ray ray, SampleGenerator sampler, int sampleIndex, Color outColor);
+	void generatePhotonMap(Scene scene);
 }

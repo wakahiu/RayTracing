@@ -52,6 +52,8 @@ public class RayTracer {
         
         Parser parser = new Parser();
         for (int ctr = 0; ctr < args.length; ctr++) {
+
+            System.out.println(args.length);
             
             // Get the input/output filenames.
             String inputFilename = args[ctr];
@@ -78,6 +80,7 @@ public class RayTracer {
         		;
         	}
         }
+        System.out.println("--------------------------------------------------------");
     }
     
     /**
@@ -97,7 +100,7 @@ public class RayTracer {
                 viewer = QuickViewer.createImageViewer(image);
             else viewer.setImage(image);
         } //else
-            System.err.print("Starting render...");
+        System.out.println("Starting render...");
         
         // Set the camera aspect ratio to match output image
         int width = image.getWidth();
@@ -110,6 +113,15 @@ public class RayTracer {
         //Timeing counters
         long totalTime = 0;
         long blockStart;
+
+        /*
+        * Photon mapping.
+        * Need to first create a photon map.
+        */
+        Renderer Rend = scene.getRenderer();
+        if( Rend.usesPhotons() ){
+            Rend.generatePhotonMap(scene);    
+        }
         
         //Loop over all blocks and render
         int offsetX, offsetY, sizeX, sizeY;

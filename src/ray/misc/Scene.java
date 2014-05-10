@@ -68,6 +68,16 @@ public class Scene {
     {
     	return surfaces;
     }
+
+    public ArrayList<Surface> getLuminaires()
+    {
+        return luminaires;
+    }
+
+    public ArrayList<PointLight> getPointLights()
+    {
+        return pointLights;
+    }
     
     /**
      * @return Returns the outputImage.
@@ -177,10 +187,6 @@ public class Scene {
     
     public void addLight(PointLight plight) {
     	pointLights.add(plight);
-    }
-    
-    public ArrayList<PointLight> getPointLights() {
-    	return pointLights;
     }
     
     /**

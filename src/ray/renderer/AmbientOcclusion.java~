@@ -20,16 +20,6 @@ public class AmbientOcclusion implements Renderer {
 	}
 	
 	@Override
-	public boolean usesPhotons(){
-		return false;
-	}
-
-	@Override
-	public void generatePhotonMap(Scene scene){ 
-		//No photon map to be generated here.
-	}
-
-	@Override
 	public void rayRadiance(Scene scene, Ray ray, SampleGenerator sampler,
 			int sampleIndex, Color outColor) {
 		// find if the ray intersect with any surface
