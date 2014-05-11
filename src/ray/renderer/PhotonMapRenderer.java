@@ -7,6 +7,7 @@ import java.util.Random;
 import ray.light.PointLight;
 import ray.math.Geometry;
 import ray.math.Point2;
+import ray.math.Point3;
 import ray.math.Vector3;
 import ray.misc.Photon;
 import ray.misc.Color;
@@ -16,10 +17,16 @@ import ray.surface.Surface;
 import ray.misc.Scene;
 import ray.sampling.SampleGenerator;
 import ray.material.Material;
+import ray.kdtree.KDTree;
+import ray.kdtree.KeyDuplicateException;
+import ray.kdtree.KeySizeException;
 
 public class PhotonMapRenderer implements Renderer {
 
 	private long photonsPerLight = 1000;
+
+	//Creates a 3 dimensional KDTree.
+	KDTree kdt = new KDTree(3);
 
 	private Random randGenerator = new Random();
 	
@@ -90,9 +97,21 @@ public class PhotonMapRenderer implements Renderer {
 			Material iMat = iRec.surface.getMaterial();
 
 			//The output radiance is a function 
-			//Check if emmiter.
-			//?
+			///TODO: Check if emmiter.
+			
+			//Right now all photons are absorbed.
+			//TODO handle other visual effects.
+			Point3 sri_point = iRec.frame.o;
+			double[] surface_and_ray_interaction_point = {sri_point.x,sri_point.y,sri_point.z};
 
+			try{
+				photon.setPosition(sri_point);
+				kdt.insert(surface_and_ray_interaction_point,photon);
+			}catch(KeySizeException ksze){
+				System.err.println("");
+			}catch(KeyDuplicateException kde){
+				System.err.println("");
+			}
 			//Russian Roulette to determine wheather photon undergoes
 			// absorption, reflection - specular or diffuse- or transmision.
 			double russianRouletteRV = randGenerator.nextDouble();
@@ -120,6 +139,20 @@ public class PhotonMapRenderer implements Renderer {
 		
 		if (scene.getFirstIntersection(iRec, ray)) {
 			
+			Point3 sri_point = iRec.frame.o;
+			double[] surface_and_ray_interaction_point = {sri_point.x,sri_point.y,sri_point.z};
+
+			Object ph;
+			try{
+				ph = kdt.nearest(surface_and_ray_interaction_point);
+				ph.position.distanceSquared(sri_point);
+
+			}catch(KeySizeException ksze){
+				System.err.println("");
+			}
+			outColor.set(0.2,0.0,1.0);
+
+			/*
 			Point2 directSeed = new Point2();
             sampler.sample(1, sampleIndex, directSeed);     // this random variable is for incident direction
             
@@ -146,6 +179,7 @@ public class PhotonMapRenderer implements Renderer {
                 	outColor.set(0.);
             }
             return;
+            */
 		}
 		
 		scene.getBackground().evaluate(ray.direction, outColor);
