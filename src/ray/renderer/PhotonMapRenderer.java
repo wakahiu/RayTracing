@@ -79,8 +79,10 @@ public class PhotonMapRenderer implements Renderer {
 				//Store it in the photon map.
 				Ray ray = new Ray(currlight.location,currlight.sampleDirection());
 				ray.makeOffsetRay();
-				Photon photon = new Photon();
+				Photon photon = new Photon(currlight.power);
+				photon.power.scale(1.0/photonsPerLight);
 				castPhoton(ray,scene, photon);
+				//System.out.println(photon.power);
 				//sampleDirection
 				//ray.
 			}
@@ -110,7 +112,7 @@ public class PhotonMapRenderer implements Renderer {
 			}catch(KeySizeException ksze){
 				System.err.println("");
 			}catch(KeyDuplicateException kde){
-				System.err.println("");
+				System.err.println("x");
 			}
 			//Russian Roulette to determine wheather photon undergoes
 			// absorption, reflection - specular or diffuse- or transmision.
@@ -143,46 +145,19 @@ public class PhotonMapRenderer implements Renderer {
 			double[] surface_and_ray_interaction_point = {sri_point.x,sri_point.y,sri_point.z};
 
 			double dist = 0.0;
+			Color pow = new Color();
 			Photon ph;
 			try{
 				ph = (Photon)kdt.nearest(surface_and_ray_interaction_point);
 				dist = ph.position.distanceSquared(sri_point);
-
+				pow.set( ph.power );
 			}catch(KeySizeException ksze){
 				System.err.println("");
 			}
-			//System.out.println(dist);
-			outColor.set(dist/300000);
+			pow.scale(dist/10000);
+			//System.out.println(pow);
+			outColor.set(pow);
 			return;
-
-			/*
-			Point2 directSeed = new Point2();
-            sampler.sample(1, sampleIndex, directSeed);     // this random variable is for incident direction
-            
-            Material iMat = iRec.surface.getMaterial();
-            //Color oColor = iMat.getBRDF(iRec).getDiffuseReflectance();
-
-            // Generate a random incident direction
-            Vector3 incDir = new Vector3();
-            Geometry.squareToHemisphere(directSeed, incDir);
-            iRec.frame.frameToCanonical(incDir);
-            
-            Ray shadowRay = new Ray(iRec.frame.o, incDir);
-            shadowRay.makeOffsetRay();
-            
-            if ( !scene.getFirstIntersection(iRec, shadowRay) ) {
-
-            	outColor.set(0.2,0.0,0.9);
-            } else {
-            	// determine the length of the shadow ray
-                Vector3 exts = scene.getBoundingBoxExtents();
-                if ( iRec.t > length * exts.length() ) 
-                	outColor.set(0.8);
-                else 
-                	outColor.set(0.);
-            }
-            return;
-            */
 		}
 		
 		scene.getBackground().evaluate(ray.direction, outColor);

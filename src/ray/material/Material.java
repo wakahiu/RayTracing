@@ -1,12 +1,12 @@
 package ray.material;
 
-import ray.brdf.BRDF;
+import ray.bsdf.BSDF;
 import ray.misc.Color;
 import ray.misc.IntersectionRecord;
 import ray.misc.LuminaireSamplingRecord;
 
 /**
- * A material is responsible for returning an emitted radiance and a BRDF
+ * A material is responsible for returning an emitted radiance and a BSDF
  * at any point on a surface.
  * 
  * @author ags +latest $Author: srm $
@@ -19,12 +19,12 @@ public interface Material {
 	public static Material DEFAULT_MATERIAL = new Homogeneous();
 	
 	/**
-	 * Get the BRDF of this material at the intersection described in iRec.
+	 * Get the BSDF of this material at the intersection described in iRec.
 	 * @param record The intersection record, which holds the location, normal, etc.
 	 * @return The BRDF for this material at this point
 	 */
-	public BRDF getBRDF(IntersectionRecord iRec);
-	
+	public BSDF getBSDF(IntersectionRecord iRec);
+
 	/**
 	 * Get the emitted radiance of this material at the location and direction described
 	 * in lRec.

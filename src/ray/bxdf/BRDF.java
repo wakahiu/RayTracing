@@ -1,14 +1,13 @@
-package ray.bsdf;
+package ray.brdf;
 
 import ray.math.Frame3;
 import ray.math.Point2;
 import ray.math.Vector3;
 import ray.misc.Color;
+import ray.bsdf.BSDF;
 
 /**
-* Really just need transmittance effects but I am too lazy to undate the comments bellow.
-*
- * A BSDF gives information about the directional scattering properties of a
+ * A BRDF gives information about the directional scattering properties of an opaque
  * surface.  It is a function of two directions, and it is generally used by integrating
  * over the hemisphere wrt. one direction while keeping the other direction fixed.
  * For that usage, this interface has the standard form for a function that will be used
@@ -19,7 +18,7 @@ import ray.misc.Color;
  * @author srm
  *
  */
-public interface BSDF {
+public interface BRDF extends BSDF {
     
     /**
      * Evaluate the BRDF.  Must be reciprocal (invariant to swapping arguments).

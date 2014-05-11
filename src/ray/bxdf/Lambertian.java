@@ -15,21 +15,15 @@ public class Lambertian implements BRDF {
     
     // The material's diffuse reflectance (the fraction of incident irradiance reflected, for any incident distribution).
     private Color diffuseReflectance = new Color(0.5, 0.5, 0.5);
-    private Color specularReflectance = new Color(0.5, 0.5, 0.5);
-    private Color transmittance = new Color(0.0, 0.0, 0.0);
     
     // For the benefit of the parser
     public Lambertian() { }
     public void setReflectance(Color reflectance) { 
         this.diffuseReflectance.set(reflectance); 
-        this.specularReflectance.set(reflectance); 
-        this.transmittance.set(reflectance); 
     }
     public Color getDiffuseReflectance(){return this.diffuseReflectance;}
 
     public void setDiffuseReflectance(Color reflectance) { this.diffuseReflectance.set(reflectance); }
-    public void setSpecularReflectance(Color reflectance) { this.specularReflectance.set(reflectance); }
-    public void setTransmittance(Color reflectance) { this.transmittance.set(reflectance); }
     
     public Lambertian(Color reflectance) { this.diffuseReflectance.set(reflectance); }
 
