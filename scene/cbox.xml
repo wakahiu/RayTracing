@@ -1,7 +1,7 @@
 <scene>
 
   <image>
-    200 200
+    600 600
   </image>
 
   <sampler type="JitteredSampler">
@@ -10,11 +10,11 @@
   </sampler>
 
   <renderer type="PhotonMapRenderer">
-    <photonsPerLight>1000</photonsPerLight>
+    <photonsPerLight>10</photonsPerLight>
   </renderer>
 
   <light type="PointLight">
-      <location>0. 510. 0</location>
+      <location>0. -500. 0</location>
       <power>510</power>
   </light>
 

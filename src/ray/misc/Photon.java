@@ -4,7 +4,7 @@ import ray.math.Point3;
 
 public class Photon{
 
-	Point3 position = new Point3();
+	public Point3 position = new Point3();
 
 	//Default constructor 
 	public Photon(){}

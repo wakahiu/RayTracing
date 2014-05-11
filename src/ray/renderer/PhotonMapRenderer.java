@@ -142,15 +142,18 @@ public class PhotonMapRenderer implements Renderer {
 			Point3 sri_point = iRec.frame.o;
 			double[] surface_and_ray_interaction_point = {sri_point.x,sri_point.y,sri_point.z};
 
-			Object ph;
+			double dist = 0.0;
+			Photon ph;
 			try{
-				ph = kdt.nearest(surface_and_ray_interaction_point);
-				ph.position.distanceSquared(sri_point);
+				ph = (Photon)kdt.nearest(surface_and_ray_interaction_point);
+				dist = ph.position.distanceSquared(sri_point);
 
 			}catch(KeySizeException ksze){
 				System.err.println("");
 			}
-			outColor.set(0.2,0.0,1.0);
+			//System.out.println(dist);
+			outColor.set(dist/300000);
+			return;
 
 			/*
 			Point2 directSeed = new Point2();
