@@ -27,7 +27,9 @@
 
   <material name="white" type="Homogeneous">
     <brdf type="Lambertian">
-      <reflectance>0.75 0.75 0.75</reflectance>
+      <specularReflectance>0.75 0.75 0.75</specularReflectance>
+      <diffuseReflectance>0.75 0.75 0.75</diffuseReflectance>
+      <transmittance>0.75 0.75 0.75</transmittance>
     </brdf>
   </material>
   <material name="red" type="Homogeneous">

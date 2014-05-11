@@ -15,6 +15,7 @@ import ray.misc.Ray;
 import ray.surface.Surface;
 import ray.misc.Scene;
 import ray.sampling.SampleGenerator;
+import ray.material.Material;
 
 public class PhotonMapRenderer implements Renderer {
 
@@ -32,7 +33,9 @@ public class PhotonMapRenderer implements Renderer {
 	public boolean usesPhotons(){
 		return true;
 	}
-
+	/**
+	* Photon tracing pass.
+	*/
 	@Override
 	public void generatePhotonMap(Scene scene){ 
 		//Get all the light sources. Point lights and luminaires
@@ -84,21 +87,29 @@ public class PhotonMapRenderer implements Renderer {
 
 		if(scene.getFirstIntersection(iRec,ray)){
 
+			Material iMat = iRec.surface.getMaterial();
+
+			//The output radiance is a function 
+			//Check if emmiter.
+			//?
+
 			//Russian Roulette to determine wheather photon undergoes
 			// absorption, reflection - specular or diffuse- or transmision.
 			double russianRouletteRV = randGenerator.nextDouble();
 
-			//Absorpion
+			//Diffuse reflection
 
 			//Specular reflection
 
-			//Diffuse reflection
-
 			//Transmission
+
+			//Absorpion
 		}
 		//Ray did not meet any object. Do nothing.
 	}
-
+	/**
+	* Rendering pass
+	*/
 	@Override
 	public void rayRadiance(Scene scene, Ray ray, SampleGenerator sampler,
 			int sampleIndex, Color outColor) {
@@ -112,6 +123,9 @@ public class PhotonMapRenderer implements Renderer {
 			Point2 directSeed = new Point2();
             sampler.sample(1, sampleIndex, directSeed);     // this random variable is for incident direction
             
+            Material iMat = iRec.surface.getMaterial();
+            //Color oColor = iMat.getBRDF(iRec).getDiffuseReflectance();
+
             // Generate a random incident direction
             Vector3 incDir = new Vector3();
             Geometry.squareToHemisphere(directSeed, incDir);
@@ -121,7 +135,8 @@ public class PhotonMapRenderer implements Renderer {
             shadowRay.makeOffsetRay();
             
             if ( !scene.getFirstIntersection(iRec, shadowRay) ) {
-            	outColor.set(0.8);
+
+            	outColor.set(0.2,0.0,0.9);
             } else {
             	// determine the length of the shadow ray
                 Vector3 exts = scene.getBoundingBoxExtents();

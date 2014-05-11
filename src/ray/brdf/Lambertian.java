@@ -14,23 +14,34 @@ import ray.misc.Color;
 public class Lambertian implements BRDF {
     
     // The material's diffuse reflectance (the fraction of incident irradiance reflected, for any incident distribution).
-    Color reflectance = new Color(0.5, 0.5, 0.5);
+    private Color diffuseReflectance = new Color(0.5, 0.5, 0.5);
+    private Color specularReflectance = new Color(0.5, 0.5, 0.5);
+    private Color transmittance = new Color(0.0, 0.0, 0.0);
     
     // For the benefit of the parser
     public Lambertian() { }
-    public void setReflectance(Color reflectance) { this.reflectance.set(reflectance); }
+    public void setReflectance(Color reflectance) { 
+        this.diffuseReflectance.set(reflectance); 
+        this.specularReflectance.set(reflectance); 
+        this.transmittance.set(reflectance); 
+    }
+    public Color getDiffuseReflectance(){return this.diffuseReflectance;}
+
+    public void setDiffuseReflectance(Color reflectance) { this.diffuseReflectance.set(reflectance); }
+    public void setSpecularReflectance(Color reflectance) { this.specularReflectance.set(reflectance); }
+    public void setTransmittance(Color reflectance) { this.transmittance.set(reflectance); }
     
-    public Lambertian(Color reflectance) { this.reflectance.set(reflectance); }
+    public Lambertian(Color reflectance) { this.diffuseReflectance.set(reflectance); }
 
     public void evaluate(Frame3 frame, Vector3 incDir, Vector3 reflDir, Color outBRDFValue) {
-        outBRDFValue.set(reflectance);
+        outBRDFValue.set(diffuseReflectance);
         outBRDFValue.scale(1 / Math.PI);
     }
 
     public void generate(Frame3 frame, Vector3 fixedDir, Vector3 dir, Point2 seed, Color outWeight) {
         Geometry.squareToPSAHemisphere(seed, dir);
         frame.frameToCanonical(dir);
-        outWeight.set(reflectance);
+        outWeight.set(diffuseReflectance);
     }
 
     /**
