@@ -67,16 +67,19 @@ public class Sphere extends Surface {
         // generate a random point 
         Point2 directSeed = new Point2();
 
-        directSeed.set(randSphere.nextDouble(), randSphere.nextDouble());
+
+        directSeed.set(randSphere.nextDouble(),randSphere.nextDouble());
+        //seekDir.set(randSphere.nextDouble(), randSphere.nextDouble(),randSphere.nextDouble());
+           
 
         // this seed is used for generating 'seekDir', a direction vector which would help us reach a surface 
         //point on the sphere
 
         //sampler.sample(0, 0, directSeed); 
-        Geometry.squareToPSAHemisphere(directSeed, seekDir);
+        Geometry.squareToHemisphere(directSeed, seekDir);
+        
+
         seekDir.normalize();
-
-
         //seekDir.scale(this.radius);
 
         Point3 surfacePoint = new Point3();        
@@ -121,14 +124,14 @@ public class Sphere extends Surface {
     public Ray chooseSampleRay(){
         Ray ray = generateSurfaceNormalRay();
 
-        System.out.println(" Ray origin x" +ray.origin.x + " Ray origin y" +ray.origin.y);
-        System.out.println(" Ray direction x" +ray.direction.x + " Ray direction y" +ray.direction.y + " Ray direction z" +ray.direction.z); 
+        //System.out.println(" Ray origin x" +ray.origin.x + " Ray origin y" +ray.origin.y);
+        //System.out.println(" Ray direction x" +ray.direction.x + " Ray direction y" +ray.direction.y + " Ray direction z" +ray.direction.z); 
 
-        System.out.println("End of one part");
+        //System.out.println("End of one part");
         ray = generateSurfaceRandomRay(ray);
 
-        System.out.println(" Ray origin x" +ray.origin.x + " Ray origin y" +ray.origin.y);
-        System.out.println(" Ray direction x" +ray.direction.x + " Ray direction y" +ray.direction.y + " Ray direction z" +ray.direction.z); 
+        //System.out.println(" Ray origin x" +ray.origin.x + " Ray origin y" +ray.origin.y);
+        //System.out.println(" Ray direction x" +ray.direction.x + " Ray direction y" +ray.direction.y + " Ray direction z" +ray.direction.z); 
 
         return ray;
 
