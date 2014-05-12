@@ -156,14 +156,32 @@ public class PhotonMapRenderer implements Renderer {
 					photon.setPosition(sri_point);
 					kdt.insert(surface_and_ray_interaction_point,photon);
 
+					//Create a ray in a random direction sampled over a hemisphere
+					Point2 directSeed = new Point2(); 
+					directSeed.set(randGenerator.nextDouble(), randGenerator.nextDouble());
+					Vector3 randomDir = new Vector3();
+					Geometry.squareToHemisphere(directSeed, randomDir);
+					randomDir.normalize();
+
+					//Reorient the direction to have its base aligned to the tangent plane of the surface
+					iRec.frame.canonicalToFrame(randomDir);
+
 					//Cast another ray in a random direction in the hemisphere above the surface.
-					/*
-					Ray diffRay = new Ray(sri_point,currlight.sampleDirection());
+					Ray diffRay = new Ray(sri_point, randomDir);
 					diffRay.makeOffsetRay();
-					Photon diffPhoton = new Photon(currlight.power);
-					diffPhoton.power.scale(1.0/photonsPerLight);
+
+					//Readjust power to account for probability of survival
+					Color outPower = new Color(photon.power);
+					outPower.invScale( pDiff);
+
+					BSDF bsdf = iRec.surface.getMaterial().getBSDF(iRec);
+					Color outDiff = new Color();
+					bsdf.evaluate(iRec.frame,null,null,outDiff);
+					outPower.scale(outDiff);
+
+					//Finally create a photon and cast it.
+					Photon diffPhoton = new Photon( outPower );
 					castPhoton(diffRay,scene, diffPhoton);
-					*/
 					
 				}
 					//Transmission
@@ -193,7 +211,7 @@ public class PhotonMapRenderer implements Renderer {
 		// find if the ray intersect with any surface
 		IntersectionRecord iRec = new IntersectionRecord();
 
-		int numNear = 1;
+		int numNear = 50;
 		
 		if (scene.getFirstIntersection(iRec, ray)) {
 			

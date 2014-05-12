@@ -105,6 +105,7 @@ public class Color {
     this.b /= rhs.b;
   }
 
+
   /**
    * Scales each compoenent of this color by rhs.
    * @param rhs The scale value to use.
@@ -114,6 +115,17 @@ public class Color {
     this.r *= rhs;
     this.g *= rhs;
     this.b *= rhs;
+  }
+
+  /**
+   * Scales each compoenent of this color by rhs.
+   * @param rhs The scale value to use.
+   */
+  public void invScale(double rhs) {
+
+    this.r /= rhs;
+    this.g /= rhs;
+    this.b /= rhs;
   }
 
   /**

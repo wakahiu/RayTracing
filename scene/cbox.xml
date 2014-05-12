@@ -10,7 +10,7 @@
   </sampler>
 
   <renderer type="PhotonMapRenderer">
-    <photonsPerLight>1000</photonsPerLight>
+    <photonsPerLight>100000</photonsPerLight>
   </renderer>
 
   <light type="PointLight">
@@ -46,6 +46,13 @@
     </bsdf>
   </material>
 
+  <material name="yellow" type="Homogeneous">
+    <bsdf type="Transluscent">
+      <reflectance>0.95 0.95 0.0</reflectance>
+      <transmittance>0.05 0.05 0.05</transmittance>
+    </bsdf>
+  </material>
+
     <material name="cyan" type="Homogeneous">
     <bsdf type="Transluscent">
       <reflectance>0.0 0.85 0.85</reflectance>
@@ -77,6 +84,11 @@
   <surface type="Mesh">
     <material ref="red" />
     <data>cbox-red.msh</data>
+  </surface>
+
+  <surface type="Mesh">
+    <material ref="yellow" />
+    <data>cbox-light.msh</data>
   </surface>
 <!--
   <surface type="Mesh">
