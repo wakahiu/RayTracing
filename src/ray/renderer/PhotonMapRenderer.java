@@ -12,6 +12,7 @@ import ray.math.Vector3;
 import ray.misc.Photon;
 import ray.misc.Color;
 import ray.misc.IntersectionRecord;
+import ray.misc.LuminaireSamplingRecord;
 import ray.misc.Ray;
 import ray.surface.Surface;
 import ray.bsdf.BSDF;
@@ -65,7 +66,13 @@ public class PhotonMapRenderer implements Renderer {
 				//Cast the photon into the scene.
 				//Get it's interacting with the scene.
 				//Store it in a photon map.
-				
+				Ray ray = currLight.chooseSampleRay();
+				LuminaireSamplingRecord lRec = new LuminaireSamplingRecord();
+				Color power = new Color(1.0,1.0,0.0);
+				currLight.getMaterial().emittedRadiance(lRec,power);
+				Photon photon = new Photon(power);
+				photon.power.scale(1.0/photonsPerLight);
+				castPhoton(ray, scene, photon);
 			}
 		}
 
@@ -111,16 +118,19 @@ public class PhotonMapRenderer implements Renderer {
 			// absorption, reflection - specular or diffuse- or transmision.
 			double russianRouletteRV = randGenerator.nextDouble();
 
-			double pSpec = 0.9;
+			double pSpec = 0.1;
 			double pDiff = 0.4;
-			double pTrans = 0.0;
-			double pTotal = pSpec + pDiff + pTrans;
+			double pTrans = 0.3;
+
+			if( (pSpec+pDiff+pTrans) >= 1.0 ){
+				System.err.println("Photon probabilities must be in the interval [0,1]");
+			}
 
 			try{
 
 				//Specular reflection. 
 				//Reflect the photon and mark it as having undergone Caustic reflection.
-				if(russianRouletteRV<pSpec/pTotal){
+				if(russianRouletteRV<pSpec){
 					/*
 					//Cast another ray in the reflected direction
 					Vector3 refDir = new Vector3(ray.direction);
@@ -140,31 +150,31 @@ public class PhotonMapRenderer implements Renderer {
 					*/
 				}
 					//Diffuse Reflection
-				else if(russianRouletteRV<(pSpec+pDiff)/pTotal){
-
-					/*
+				else if(russianRouletteRV<(pSpec+pDiff)){
+					
 					//Store this current photon in the global photon map.
 					photon.setPosition(sri_point);
 					kdt.insert(surface_and_ray_interaction_point,photon);
 
-					//Cast another ray in a random direction
+					//Cast another ray in a random direction in the hemisphere above the surface.
+					/*
 					Ray diffRay = new Ray(sri_point,currlight.sampleDirection());
 					diffRay.makeOffsetRay();
 					Photon diffPhoton = new Photon(currlight.power);
 					diffPhoton.power.scale(1.0/photonsPerLight);
 					castPhoton(diffRay,scene, diffPhoton);
 					*/
+					
 				}
 					//Transmission
-				else if(russianRouletteRV<(pSpec+pDiff+pTrans)/pTotal){
-
+				else if(russianRouletteRV<(pSpec+pDiff+pTrans)){
 
 				}
 					//Absorption
-				else{	
+				else{
+					photon.setPosition(sri_point);
+					kdt.insert(surface_and_ray_interaction_point,photon);	
 				}
-				photon.setPosition(sri_point);
-				kdt.insert(surface_and_ray_interaction_point,photon);
 
 			}catch(KeySizeException ksze){
 				System.err.println("");
@@ -183,7 +193,7 @@ public class PhotonMapRenderer implements Renderer {
 		// find if the ray intersect with any surface
 		IntersectionRecord iRec = new IntersectionRecord();
 
-		int numNear = 50;
+		int numNear = 1;
 		
 		if (scene.getFirstIntersection(iRec, ray)) {
 			
@@ -214,7 +224,7 @@ public class PhotonMapRenderer implements Renderer {
 			}catch(KeySizeException ksze){
 				System.err.println("");
 			}
-			pow.scale(1/distSq*30000);
+			pow.scale(1/distSq*3000000);
 			//System.out.println(pow);
 			outColor.set(outBSDFValue);
 			

@@ -57,7 +57,7 @@ public class Sphere extends Surface {
     {
 
         
-        Random random = new Random(1);
+        Random random = new Random();
 
         Vector3 seekDir = new Vector3();
         Vector3 normDir = new Vector3();
@@ -115,7 +115,14 @@ public class Sphere extends Surface {
           generatedRay.set(surfaceRay.origin, randomDir);
         }
 
+        generatedRay.makeOffsetRay();
         return generatedRay;
+
+    }
+
+    public Ray chooseSampleRay(){
+        Ray ray = generateSurfaceNormalRay();
+        return generateSurfaceRandomRay(ray);
 
     }
 

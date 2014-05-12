@@ -24,7 +24,7 @@ public interface Material {
 	 * @return The BRDF for this material at this point
 	 */
 	public BSDF getBSDF(IntersectionRecord iRec);
-
+	
 	/**
 	 * Get the emitted radiance of this material at the location and direction described
 	 * in lRec.

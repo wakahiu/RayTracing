@@ -10,11 +10,11 @@
   </sampler>
 
   <renderer type="PhotonMapRenderer">
-    <photonsPerLight>1000000</photonsPerLight>
+    <photonsPerLight>1000</photonsPerLight>
   </renderer>
 
   <light type="PointLight">
-      <location>278.0 300.0 0.0</location>
+      <location>278.0 273.0 0.0</location>
       <power>0.95 0.95 0.95</power>
    </light>
 
@@ -60,13 +60,13 @@
     </bsdf>
   </material>
 
-  <!--material name="light" type="LambertianEmitter">
+  <material name="light" type="LambertianEmitter">
     <bsdf type="Transluscent">
-      <reflectance>0.75 0.75 0.75</reflectance>
-      <transmittance>0.75 0.75 0.75</transmittance>
+      <reflectance>0.95 0.95 0.95</reflectance>
+      <transmittance>0.95 0.95 0.95</transmittance>
     </bsdf>
-    <radiance>60 60 60</radiance>
-  </material-->
+    <radiance>100 100 100</radiance>
+  </material>
 
 
   <surface type="Mesh">
@@ -89,9 +89,15 @@
     <data>cbox-green.msh</data>
   </surface>
 
+  <!--surface type="Sphere">
+    <material ref="light" />
+    <center>278.0 273.0 0</center>
+    <radius>1.0e-10</radius>
+  </surface-->
+
   <surface type="Sphere">
     <material ref="cyan" />
-    <center>278.0 273.0 0</center>
+    <center>278.0 262.0 0</center>
     <radius>10.0</radius>
   </surface>
 

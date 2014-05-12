@@ -78,6 +78,11 @@ public abstract class Surface {
                                               LuminaireSamplingRecord lRec);
 
     /**
+     * Choose a ray emanating from a random point on the surface in a random direction
+     */
+    public abstract Ray chooseSampleRay( );
+
+    /**
      * The pdf corresponding to chooseSamplePoint.  
      * LRec must describe a visible point on a luminaire.    
      */
