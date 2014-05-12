@@ -143,6 +143,38 @@ public class Vector3 extends Tuple3 {
 		this.z = p1.z - p2.z;
 	}
 	
+
+	/** Siddhartha: May 11
+	 * multiply Vector3 with a scalar
+	 * @param scale the scale factor
+	 * @param vector the vector to scale
+	 */
+	public void scale(double scale) {
+		this.x = scale * this.x;
+		this.y = scale * this.y;
+		this.z = scale * this.z;
+	}
+
+
+
+	/**Siddhartha: May 11
+	 * Add a scalar multiple of a Vector3 to this Vector3
+	 * @param scale the scale factor
+	 * @param vector the vector to scale and add
+	 */
+	public void translate(Point3 center) {
+
+		Point3 p;
+
+		p.x = center.x + this.x;
+		p.y = center.y + this.y;
+		p.z = center.z + this.z;
+
+		return p;
+	}
+
+
+
 	/**
 	 * Add a scalar multiple of a Vector3 to this Vector3
 	 * @param scale the scale factor
