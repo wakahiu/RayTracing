@@ -43,6 +43,9 @@ public class PointLight {
      */
     public Vector3 sampleDirection( )
     {
-        return new Vector3(rndGen.nextDouble(), rndGen.nextDouble(),rndGen.nextDouble());
+    	double x = rndGen.nextDouble() * 2 - 1.0;
+    	double y = rndGen.nextDouble() * 2 - 1.0;
+    	double z = rndGen.nextDouble() * 2 - 1.0;
+        return new Vector3( x, y, z);
     }
 }
