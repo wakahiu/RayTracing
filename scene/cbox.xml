@@ -4,12 +4,12 @@
     600 600
   </image>
 
-  <!--
-
-  <sampler type="JitteredSampler">
-    <numSamplesU>4</numSamplesU>
-    <numSamplesV>4</numSamplesV>
+   <sampler type="JitteredSampler">
+    <numSamplesU>1</numSamplesU>
+    <numSamplesV>1</numSamplesV>
   </sampler>
+
+  <!--
 
   <light type="PointLight">
       <location>278.0 273.0 0.0</location>
@@ -19,7 +19,7 @@
 -->
 
   <renderer type="PhotonMapRenderer">
-    <photonsPerLight>100000</photonsPerLight>
+    <photonsPerLight>10000</photonsPerLight>
   </renderer>
 
 
@@ -28,13 +28,13 @@
     <eye>278.0 273.0 -800.0</eye>
     <target>278.0 273.0 0</target>
     <up>0 1 0</up>
-    <yFOV>40</yFOV>
+    <yFOV>80</yFOV>
   </camera>
 
   <material name="white" type="Homogeneous">
     <bsdf type="Transluscent">
-      <specReflectance>0.35 0.35 0.35</specReflectance>
-      <diffReflectance>0.35 0.35 0.35</diffReflectance>
+      <specReflectance>0.05 0.05 0.05</specReflectance>
+      <diffReflectance>0.85 0.85 0.85</diffReflectance>
       <transmittance>0.005 0.005 0.005</transmittance>
     </bsdf>
   </material>
@@ -81,9 +81,9 @@
 
   <material name="chrome" type="Homogeneous">
     <bsdf type="Transluscent">
-      <specReflectance>0.93 0.93 0.93</specReflectance>
-      <diffReflectance>0.05 0.05 0.05</diffReflectance>
-      <transmittance>0.01 0.01 0.01</transmittance>
+      <specReflectance>0.999 0.999 0.999</specReflectance>
+      <diffReflectance>0.0 0.0 0.0</diffReflectance>
+      <transmittance>0.0 0.0 0.0</transmittance>
     </bsdf>
   </material>
 
@@ -141,8 +141,8 @@
 
   <surface type="Sphere">
     <material ref="chrome" />
-    <center>178.0 262.0 0</center>
-    <radius>70.0</radius>
+    <center>300.0 432.0 370</center>
+    <radius>90.0</radius>
   </surface>
 
   <surface type="Sphere">

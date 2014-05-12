@@ -150,23 +150,35 @@ public class PhotonMapRenderer implements Renderer {
 				//Specular reflection. 
 				//Reflect the photon and mark it as having undergone Caustic reflection.
 				if(russianRouletteRV<pSpec){
-					/*
-					//Cast another ray in the reflected direction
-					Vector3 refDir = new Vector3(ray.direction);
+					
+					//Create a ray in a in  the direction of specular reflection
+					Vector3 reffDir = new Vector3(ray.direction);
+
+					//Reorient the direction to have its base aligned to the tangent plane of the surface
+					iRec.frame.canonicalToFrame(reffDir);
+
+					double x = reffDir.x;
+					double y = reffDir.y;
+					double z = reffDir.z;
+
+					reffDir.set(x,y,-z);
 
 
-					Ray refRay = new Ray(sri_point, refDir);
-					iRec.frame.canonicalToFrame(refRay.direction);
+					iRec.frame.frameToCanonical(reffDir);
 
-					//Reflect it.
-					//refRay.direction.scaleAdd(1.0,);
+					//Cast another ray in a random direction in the hemisphere above the surface.
+					Ray specRay = new Ray(sri_point, reffDir);
+					specRay.makeOffsetRay();
 
-					iRec.frame.frameToCanonical(refRay.direction);
-					ray.makeOffsetRay();
-					Photon diffPhoton = new Photon(currlight.power);
-					diffPhoton.power.scale(1.0/photonsPerLight);
-					castPhoton(diffDay,scene, diffPhoton);
-					*/
+					//Readjust power to account for probability of survival
+					Color outPower = new Color(photon.power);
+					outPower.invScale( pSpec);
+					outPower.scale(specReflectance);
+
+					//Finally create a photon and cast it.
+					Photon specPhoton = new Photon( outPower );
+					castPhoton(specRay,scene, specPhoton);
+
 				}
 					//Diffuse Reflection
 				else if(russianRouletteRV<(pSpec+pDiff)){
@@ -198,10 +210,24 @@ public class PhotonMapRenderer implements Renderer {
 					//Transmission
 				else if(russianRouletteRV<(pSpec+pDiff+pTrans)){
 
+					Vector3 transDir = new Vector3(ray.direction);
+
+					//Cast another ray in a random direction in the hemisphere above the surface.
+					Ray transRay = new Ray(sri_point, transDir);
+					transRay.makeOffsetRay();
+
+					//Readjust power to account for probability of survival
+					Color outPower = new Color(photon.power);
+					outPower.invScale( pTrans );
+					outPower.scale(transmittance);
+
+					//Finally create a photon and cast it.
+					Photon transPhoton = new Photon( outPower );
+					castPhoton(transRay,scene, transPhoton);
 				}
 					//Absorption
 				else{
-					//Ray dies. RIP in the photon map
+					//Photon dies. RIP in the photon map
 				}
 				photon.setPosition(sri_point);
 				globalPhotonMap.insert(surface_and_ray_interaction_point,photon);	
@@ -230,10 +256,6 @@ public class PhotonMapRenderer implements Renderer {
 			Point3 sri_point = iRec.frame.o;
 			Color outBSDFValue = new Color();
 
-			//Get the material properties at the point of intersection.
-			BSDF bsdf = iRec.surface.getMaterial().getBSDF(iRec);
-			bsdf.evaluate(iRec.frame,null,null,outBSDFValue);
-
 			double[] surface_and_ray_interaction_point = {sri_point.x,sri_point.y,sri_point.z};
 
 			double distSq = 0.0;
@@ -241,7 +263,124 @@ public class PhotonMapRenderer implements Renderer {
 			
 			Object [] objPhotons;
 
+			//Get the material properties at the point of intersection.
+			BSDF bsdf = iRec.surface.getMaterial().getBSDF(iRec);
+			Color specReflectance = new Color();
+			Color diffReflectance  = new Color();
+			Color transmittance  = new Color();
+
+			bsdf.getComponets(specReflectance, diffReflectance, transmittance);
+
+			bsdf.evaluate(iRec.frame,null,null,outBSDFValue);
+
+			//Get the specular reflection of the material.
+			//Get the diffuse reflection propeties of the material
+			//Get the transmittion properties of the material.
+			double pSpec = (specReflectance.r+specReflectance.g+specReflectance.b)/3.0;
+			double pDiff = (diffReflectance.r+diffReflectance.g+diffReflectance.b)/3.0;
+			double pTrans = (transmittance.r+transmittance.g+transmittance.b)/3.0;
+
+
+			if( (pSpec+pDiff+pTrans) > 1.0 ){
+				System.err.println("Photon probabilities must be in the interval [0,1]");
+			}
+			if( (pSpec+pDiff+pTrans) == 1.0 ){
+				System.err.println("Warning: not aboption");
+			}
+
 			try{
+
+				double russianRouletteRV = randGenerator.nextDouble();
+				//Specular reflection. 
+				//Reflect the photon and mark it as having undergone Caustic reflection.
+				if(russianRouletteRV<pSpec){
+					
+					//Create a ray in a in  the direction of specular reflection
+					Vector3 reffDir = new Vector3(ray.direction);
+
+					//Reorient the direction to have its base aligned to the tangent plane of the surface
+					iRec.frame.canonicalToFrame(reffDir);
+
+					double x = reffDir.x;
+					double y = reffDir.y;
+					double z = reffDir.z;
+
+					reffDir.set(x,y,-z);
+
+					iRec.frame.frameToCanonical(reffDir);
+
+					//Create the ray emainating from the point on intersection oriented in the 
+					//direction of reflection.
+					Ray specRay = new Ray(sri_point, reffDir);
+					specRay.makeOffsetRay();
+
+					//Castt 
+					rayRadiance(scene, specRay, sampler, sampleIndex, outColor);
+					//outColor.set(1.0,1.0,0.0);
+					return;
+
+				}
+					//Diffuse Reflection
+				else if(russianRouletteRV<(pSpec+pDiff)){
+
+					/*
+					//Create a ray in a random direction sampled over a hemisphere
+					Point2 directSeed = new Point2(); 
+					directSeed.set(randGenerator.nextDouble(), randGenerator.nextDouble());
+					Vector3 randomDir = new Vector3();
+					Geometry.squareToHemisphere(directSeed, randomDir);
+					randomDir.normalize();
+
+					//Reorient the direction to have its base aligned to the tangent plane of the surface
+					iRec.frame.canonicalToFrame(randomDir);
+
+					//Cast another ray in a random direction in the hemisphere above the surface.
+					Ray diffRay = new Ray(sri_point, randomDir);
+					diffRay.makeOffsetRay();
+
+					//Readjust power to account for probability of survival
+					Color outPower = new Color(photon.power);
+					outPower.invScale( pDiff);
+					outPower.scale(diffReflectance);
+
+					//Finally create a photon and cast it.
+					Photon diffPhoton = new Photon( outPower );
+					castPhoton(diffRay,scene, diffPhoton);
+					*/
+					
+				}
+					//Transmission
+				else if(russianRouletteRV<(pSpec+pDiff+pTrans)){
+
+					//Create a ray in a in  the direction of transmission
+					Vector3 transDir = new Vector3(ray.direction);
+
+					//Reorient the direction to have its base aligned to the tangent plane of the surface
+					iRec.frame.canonicalToFrame(transDir);
+
+					double x = transDir.x;
+					double y = transDir.y;
+					double z = transDir.z;
+
+					transDir.set(x*0.8,y*0.8,z);
+
+					iRec.frame.frameToCanonical(transDir);
+
+					//Create the ray emainating from the point on intersection oriented in the 
+					//direction of reflection.
+					Ray transRay = new Ray(sri_point, transDir);
+					transRay.makeOffsetRay();
+
+					//Castt 
+					rayRadiance(scene, transRay, sampler, sampleIndex, outColor);
+					//outColor.set(1.0,1.0,0.0);
+					return;
+				}
+					//Absorption
+				else{
+					//Ray dies
+				}
+
 
 				objPhotons = globalPhotonMap.nearest(surface_and_ray_interaction_point,numNear);
 
@@ -254,7 +393,7 @@ public class PhotonMapRenderer implements Renderer {
 			}catch(KeySizeException ksze){
 				System.err.println("");
 			}
-			pow.scale(1/distSq*3000000);
+			pow.scale(1.0/distSq*10000);
 			//System.out.println(pow);
 			outColor.set(outBSDFValue);
 			
