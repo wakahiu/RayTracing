@@ -19,6 +19,9 @@ import ray.misc.Ray;
  */
 public class Sphere extends Surface {
     
+    /* Added -Sid: May 12 */
+    private Random randSphere = new Random();
+
     /** Material for this sphere. */
     protected Material material = Material.DEFAULT_MATERIAL;
     
@@ -57,15 +60,14 @@ public class Sphere extends Surface {
     {
 
         
-        Random random = new Random();
+        //Random random = new Random();
 
         Vector3 seekDir = new Vector3();
-        Vector3 normDir = new Vector3();
-
+        
         // generate a random point 
         Point2 directSeed = new Point2();
 
-        directSeed.set(random.nextDouble(), random.nextDouble());
+        directSeed.set(randSphere.nextDouble(), randSphere.nextDouble());
 
         // this seed is used for generating 'seekDir', a direction vector which would help us reach a surface 
         //point on the sphere
@@ -74,16 +76,14 @@ public class Sphere extends Surface {
         Geometry.squareToPSAHemisphere(directSeed, seekDir);
         seekDir.normalize();
 
-        normDir = seekDir;
 
-        seekDir.scale(this.radius);
+        //seekDir.scale(this.radius);
 
+        Point3 surfacePoint = new Point3();        
+        Ray generatedRay= new Ray(this.center, seekDir);
+        generatedRay.evaluate(surfacePoint, this.radius);
 
-        Point3 generatedPoint = new Point3();
-
-        generatedPoint=seekDir.translate(this.center);
-
-        Ray generatedRay= new Ray(generatedPoint, normDir);
+        generatedRay.set(surfacePoint,seekDir);
 
         return generatedRay;
 
@@ -95,26 +95,24 @@ public class Sphere extends Surface {
     public Ray generateSurfaceRandomRay(Ray surfaceRay)
     {
 
-        Random random = new Random(1);
+
         Vector3 randomDir = new Vector3();
-        Ray generatedRay = new Ray(surfaceRay.origin, randomDir);
-
         Point2 directSeed = new Point2();
-        //sampler.sample(0, 0, directSeed); 
-
-        directSeed.set(random.nextDouble(), random.nextDouble());
         
+        directSeed.set(randSphere.nextDouble(), randSphere.nextDouble());
         Geometry.squareToPSAHemisphere(directSeed, randomDir);
         randomDir.normalize();
 
         double dotProduct = (surfaceRay.direction).dot(randomDir);
         
-        if (dotProduct>0)
+        if (dotProduct<0)
         {
-          randomDir.scale(dotProduct);
-          generatedRay.set(surfaceRay.origin, randomDir);
+            randomDir.scale(-1);
+
         }
 
+
+        Ray generatedRay = new Ray(surfaceRay.origin, randomDir);
         generatedRay.makeOffsetRay();
         return generatedRay;
 
@@ -122,7 +120,17 @@ public class Sphere extends Surface {
 
     public Ray chooseSampleRay(){
         Ray ray = generateSurfaceNormalRay();
-        return generateSurfaceRandomRay(ray);
+
+        System.out.println(" Ray origin x" +ray.origin.x + " Ray origin y" +ray.origin.y);
+        System.out.println(" Ray direction x" +ray.direction.x + " Ray direction y" +ray.direction.y + " Ray direction z" +ray.direction.z); 
+
+        System.out.println("End of one part");
+        ray = generateSurfaceRandomRay(ray);
+
+        System.out.println(" Ray origin x" +ray.origin.x + " Ray origin y" +ray.origin.y);
+        System.out.println(" Ray direction x" +ray.direction.x + " Ray direction y" +ray.direction.y + " Ray direction z" +ray.direction.z); 
+
+        return ray;
 
     }
 
