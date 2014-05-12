@@ -38,6 +38,12 @@ public class Lambertian implements BRDF {
         outWeight.set(diffuseReflectance);
     }
 
+    public void getComponets(Color specReflectance, Color diffReflectance, Color transmittance){
+        specReflectance.set(  new Color() );
+        diffReflectance.set(  diffuseReflectance  );
+        transmittance.set( new Color() );
+    }
+
     /**
      * @param frame frame comes from IntersectionRecord instance, where w component of this frame align with
      *        the surface normal. 

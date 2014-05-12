@@ -37,6 +37,12 @@ public class Transparent implements BTDF {
         outWeight.set(transmittance);
     }
 
+    public void getComponets(Color specReflectance, Color diffReflectance, Color transmittance){
+        specReflectance.set(  new Color() );
+        diffReflectance.set(  new Color()  );
+        transmittance.set( transmittance );
+    }
+
     /**
      * @param frame frame comes from IntersectionRecord instance, where w component of this frame align with
      *        the surface normal. 

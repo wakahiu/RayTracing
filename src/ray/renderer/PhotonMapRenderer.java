@@ -27,7 +27,10 @@ public class PhotonMapRenderer implements Renderer {
 
 	private long photonsPerLight = 1000;
 
-	//Creates a 3 dimensional KDTree.
+	//Creates a 3 dimensional KDTree represeting the global photon map.
+	KDTree globalPhotonMap = new KDTree(3);
+
+	//Creates a 3 dimensional KDTree represeting the Caustic photon map
 	KDTree kdt = new KDTree(3);
 
 	private Random randGenerator = new Random();
@@ -118,12 +121,28 @@ public class PhotonMapRenderer implements Renderer {
 			// absorption, reflection - specular or diffuse- or transmision.
 			double russianRouletteRV = randGenerator.nextDouble();
 
-			double pSpec = 0.1;
-			double pDiff = 0.4;
-			double pTrans = 0.3;
+			//Get the bsdf
+			BSDF bsdf = iRec.surface.getMaterial().getBSDF(iRec);
+			Color specReflectance = new Color();
+			Color diffReflectance  = new Color();
+			Color transmittance  = new Color();
 
-			if( (pSpec+pDiff+pTrans) >= 1.0 ){
+			bsdf.getComponets(specReflectance, diffReflectance, transmittance);
+
+			//Frensel approximation?
+
+			//Get the specular reflection of the material.
+			//Get the diffuse reflection propeties of the material
+			//Get the transmittion properties of the material.
+			double pSpec = (specReflectance.r+specReflectance.g+specReflectance.b)/3.0;
+			double pDiff = (diffReflectance.r+diffReflectance.g+diffReflectance.b)/3.0;
+			double pTrans = (transmittance.r+transmittance.g+transmittance.b)/3.0;
+
+			if( (pSpec+pDiff+pTrans) > 1.0 ){
 				System.err.println("Photon probabilities must be in the interval [0,1]");
+			}
+			if( (pSpec+pDiff+pTrans) == 1.0 ){
+				System.err.println("Warning: not aboption");
 			}
 
 			try{
@@ -151,10 +170,6 @@ public class PhotonMapRenderer implements Renderer {
 				}
 					//Diffuse Reflection
 				else if(russianRouletteRV<(pSpec+pDiff)){
-					
-					//Store this current photon in the global photon map.
-					photon.setPosition(sri_point);
-					kdt.insert(surface_and_ray_interaction_point,photon);
 
 					//Create a ray in a random direction sampled over a hemisphere
 					Point2 directSeed = new Point2(); 
@@ -173,11 +188,7 @@ public class PhotonMapRenderer implements Renderer {
 					//Readjust power to account for probability of survival
 					Color outPower = new Color(photon.power);
 					outPower.invScale( pDiff);
-
-					BSDF bsdf = iRec.surface.getMaterial().getBSDF(iRec);
-					Color outDiff = new Color();
-					bsdf.evaluate(iRec.frame,null,null,outDiff);
-					outPower.scale(outDiff);
+					outPower.scale(diffReflectance);
 
 					//Finally create a photon and cast it.
 					Photon diffPhoton = new Photon( outPower );
@@ -190,9 +201,10 @@ public class PhotonMapRenderer implements Renderer {
 				}
 					//Absorption
 				else{
-					photon.setPosition(sri_point);
-					kdt.insert(surface_and_ray_interaction_point,photon);	
+					//Ray dies. RIP in the photon map
 				}
+				photon.setPosition(sri_point);
+				globalPhotonMap.insert(surface_and_ray_interaction_point,photon);	
 
 			}catch(KeySizeException ksze){
 				System.err.println("");
@@ -231,7 +243,7 @@ public class PhotonMapRenderer implements Renderer {
 
 			try{
 
-				objPhotons = kdt.nearest(surface_and_ray_interaction_point,numNear);
+				objPhotons = globalPhotonMap.nearest(surface_and_ray_interaction_point,numNear);
 
 				float MaxDist = 0;
 				for(int i = 0; i < numNear ; i++){

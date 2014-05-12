@@ -19,7 +19,16 @@ import ray.misc.Color;
  *
  */
 public interface BSDF {
-    
+
+
+    /**
+     * Get the componets of the reflectance (specular and diffuse) and transmittance.
+     * @param specReflectance: The specular reflectance
+     * @param diffReflectance The diffuse reflectance
+     * @param transmittance The transmitance
+     */
+    public void getComponets(Color specReflectance, Color diffReflectance, Color transmittance);
+
     /**
      * Evaluate the BSDF.  Must be reciprocal (invariant to swapping arguments).
      * @param frame The surface frame

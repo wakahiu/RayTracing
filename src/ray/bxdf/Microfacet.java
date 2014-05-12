@@ -14,6 +14,7 @@ public class Microfacet implements BRDF {
     // The reflectance of the diffuse component of the BRDF
     private Color diffuseBrdf = new Color();
     
+
     // Fresnel term
     private Fresnel fresnel = new Fresnel();
     private BeckmannDistribution normalDistri = new BeckmannDistribution();
@@ -50,6 +51,12 @@ public class Microfacet implements BRDF {
     
     public void setSpecularSamplingWeight(double specularSamplingWeight) { 
         this.specularSamplingWeight = specularSamplingWeight; 
+    }
+
+    public void getComponets(Color specReflectance, Color diffReflectance, Color transmittance){
+        specReflectance.set(  new Color() );
+        diffReflectance.set(  diffuseBrdf  );
+        transmittance.set( new Color() );
     }
 
     private Random random = new Random();

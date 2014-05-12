@@ -16,32 +16,45 @@ public class Transluscent implements BSDF {
     
     // The material's trasmitance (the fraction of incident irradiance transmitted, for any incident distribution).
     private Color transmittance = new Color(0.0, 0.0, 0.0);
-    // The material's diffuse reflectance (the fraction of incident irradiance reflected, for any incident distribution).
-    private Color reflectance = new Color(0.0, 0.0, 0.0);
+    // The material's diffuse and specular reflectance (the fraction of incident irradiance reflected, for any incident distribution).
+    private Color specReflectance = new Color(0.0, 0.0, 0.0);
+    private Color diffReflectance = new Color(0.0, 0.0, 0.0);
     
     // For the benefit of the parser
     public Transluscent() { }
-    public Transluscent(Color transmittance,Color reflectance) { 
+    public Transluscent(Color transmittance,Color specReflectance,Color diffReflectance) { 
         this.transmittance.set(transmittance); 
-        this.reflectance.set(reflectance); 
+        this.specReflectance.set(specReflectance); 
+        this.diffReflectance.set(diffReflectance); 
+    }
+
+    public void getComponets(Color specReflectance, Color diffReflectance, Color transmittance){
+        specReflectance.set(this.specReflectance);
+        diffReflectance.set(this.diffReflectance);
+        transmittance.set(this.transmittance);
+
     }
 
     public void setTransmittance(Color transmittance) { 
         this.transmittance.set(transmittance); 
     }
 
-    public void setReflectance(Color reflectance) { 
-        this.reflectance.set(reflectance); 
+    public void setSpecReflectance(Color specReflectance) { 
+        this.specReflectance.set(specReflectance); 
     }
 
-    public Color getReflectance(){return this.reflectance;}
+    public void setDiffReflectance(Color diffReflectance) { 
+        this.diffReflectance.set(diffReflectance); 
+    }
 
+    public Color getSpecReflectance(){return this.specReflectance;}
+    public Color diffReflectance(){return this.diffReflectance;}
     public Color getTransmittance(){return this.transmittance;}
     
 
     //Not sure about these changes
     public void evaluate(Frame3 frame, Vector3 incDir, Vector3 outDir, Color outBSDFValue) {
-        outBSDFValue.set(reflectance);
+        outBSDFValue.set(specReflectance);
         outBSDFValue.scale(1 / Math.PI);
         //System.out.println("Not sure about this function!");
     }
