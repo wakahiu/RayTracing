@@ -48,6 +48,70 @@ public class Sphere extends Surface {
         updateArea();
     }
     
+
+    //Siddhartha:   this function  finds a random point on the surface of the sphere and then
+    // generates a random normal Ray from it.
+    public Ray generateSurfaceNormalRay()
+    {
+
+        
+
+        Vector3 seekDir = new Vector3();
+        Vector3 normDir = new Vector3()
+
+        // generate a random point 
+        Point2 directSeed = new Point2();
+
+        // this seed is used for generating 'seekDir', a direction vector which would help us reach a surface 
+        //point on the sphere
+
+        sampler.sample(0, 0, directSeed); 
+        Geometry.squareToPSAHemisphere(directSeed, seekDir);
+        seekDir.normalize();
+
+        normDir = seekDir;
+
+        seekDir.scale(this.radius);
+
+
+        Point3 generatedPoint = new Point3();
+
+        generatedPoint=seekDir.translate(this.center);
+
+        Ray generatedRay= new Ray(generatedPoint, normDir);
+
+        return generatedRay;
+
+    }
+
+    //Siddhartha:  this function generates a random from a point on the surface of the sphere with
+    // a spherical distribution
+    
+    public Ray generateSurfaceRandomRay(Ray surfaceRay)
+    {
+
+        
+        Vector3 randomDir = new Vector3();
+        Ray generatedRay = new Ray(surfaceRay.origin, randomDir);
+
+        Point2 directSeed = new Point2();
+        sampler.sample(0, 0, directSeed); 
+        Geometry.squareToPSAHemisphere(directSeed, randomDir);
+        randomDir.normalize();
+
+        double dotProduct = (surfaceRay.direction).dot(randomDir);
+        
+        if (dotProduct>0)
+        {
+          randomDir.scale(dotProduct);
+          generatedRay.set(surfaceRay.origin, randomDir);
+        }
+
+        return generatedRay;
+
+    }
+
+
     public void updateArea() {
     	area = 4 * Math.PI * radius*radius;
     	oneOverArea = 1. / area;
@@ -113,20 +177,106 @@ public class Sphere extends Surface {
      */
     public boolean intersect(IntersectionRecord outRecord, Ray ray) {
         // W4160 TODO (A)
-    	// In this function, you need to test if the given ray intersect with a sphere.
-    	// You should look at the intersect method in other classes such as ray.surface.Triangle.java
-    	// to see what fields of IntersectionRecord should be set correctly.
-    	// The following fields should be set in this function
-    	//     IntersectionRecord.t
-    	//     IntersectionRecord.frame
-    	//     IntersectionRecord.surface
-    	//
-    	// Note: Although a ray is conceptually a infinite line, in practice, it often has a length,
-    	//       and certain rendering algorithm relies on the length. Therefore, here a ray is a 
-    	//       segment rather than a infinite line. You need to test if the segment is intersect
-    	//       with the sphere. Look at ray.misc.Ray.java to see the information provided by a ray.
-    	
-        return false;
+        // In this function, you need to test if the given ray intersect with a sphere.
+        // You should look at the intersect method in other classes such as ray.surface.Triangle.java
+        // to see what fields of IntersectionRecord should be set correctly.
+        // The following fields should be set in this function
+        //     IntersectionRecord.t
+        //     IntersectionRecord.frame
+        //     IntersectionRecord.surface
+        //
+        // Note: Although a ray is conceptually a infinite line, in practice, it often has a length,
+        //       and certain rendering algorithm relies on the length. Therefore, here a ray is a 
+        //       segment rather than a infinite line. You need to test if the segment is intersect
+        //       with the sphere. Look at ray.misc.Ray.java to see the information provided by a ray.
+        
+        //return false;
+        
+        /*sc3653 - TODO(A)
+        reference - P. Shirley (fundamental of graphics)
+         
+         
+         Given - ray (e + td)
+                sphere with center 'c' and radius 'r'
+         
+         algorithm:
+         
+         1. calculate e_c= (e-c)
+         2. find discriminant (del) of "At^2 + Bt + C=0", where:
+            -> A = (d.d)
+            -> B = 2* d.e_c
+            -> C = (e_c).(e_c) - r^2
+         
+         3. if 'del' <0, return false
+         4. else, compute t(1/2)= [-B (-/+) sqrt(B^2 - 4AC)]/2A
+         5. if t1 lies between ray.start and ray.end, t=t1
+            else if t2 lies between ray.start and ray.end, t=t2
+         6. set outRecord.t, outRecord.frame, outRecord.surface
+         
+         
+        */
+        
+        
+        Vector3 e_c =new Vector3();
+        Point3 e=ray.origin;
+        Vector3 d= ray.direction;
+        
+        Point3 c=this.center;
+        double r= this.radius;
+        
+        //step 1
+        e_c.sub(e,c);
+        
+        double A= d.dot(d);
+        double B= 2 * e_c.dot(d);
+        double C= (e_c).dot(e_c) - r*r ;
+        
+        
+        //step 2
+        double del= B*B - 4 * A * C;
+        
+        //step 3
+        if(del<0)
+            return false;
+        
+        //step 4
+        double t=0;
+        double t1= (-B - Math.sqrt(del))/ (2 * A);
+        double t2= (-B + Math.sqrt(del))/ (2 * A);
+        
+        
+
+        if (t1>t2)
+        {
+            
+            t1= t1+t2;
+            t2=t1-t2;
+            t1 =t1-t2;
+        }
+        
+        
+        //step 5
+        if (t1>= ray.start && t1<=ray.end)
+            t=t1;
+        else if(t2>= ray.start && t2<=ray.end)
+            t=t2;
+        else
+            return false;
+            
+        
+        //step 6
+        outRecord.t=t;
+        ray.evaluate(outRecord.frame.o,t);
+        outRecord.frame.w.sub(outRecord.frame.o,c);
+        outRecord.frame.w.normalize();
+        outRecord.frame.initFromW();
+        
+        outRecord.surface=this;
+        
+        return true;
+        
+        
+        
     }
     
     /**
