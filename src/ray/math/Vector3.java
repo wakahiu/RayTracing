@@ -162,9 +162,9 @@ public class Vector3 extends Tuple3 {
 	 * @param scale the scale factor
 	 * @param vector the vector to scale and add
 	 */
-	public void translate(Point3 center) {
+	public Point3 translate(Point3 center) {
 
-		Point3 p;
+		Point3 p= new Point3();
 
 		p.x = center.x + this.x;
 		p.y = center.y + this.y;
