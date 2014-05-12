@@ -14,6 +14,7 @@ import ray.misc.Color;
 import ray.misc.IntersectionRecord;
 import ray.misc.Ray;
 import ray.surface.Surface;
+import ray.bsdf.BSDF;
 import ray.misc.Scene;
 import ray.sampling.SampleGenerator;
 import ray.material.Material;
@@ -106,25 +107,71 @@ public class PhotonMapRenderer implements Renderer {
 			Point3 sri_point = iRec.frame.o;
 			double[] surface_and_ray_interaction_point = {sri_point.x,sri_point.y,sri_point.z};
 
+			//Russian Roulette to determine wheather photon undergoes
+			// absorption, reflection - specular or diffuse- or transmision.
+			double russianRouletteRV = randGenerator.nextDouble();
+
+			double pSpec = 0.9;
+			double pDiff = 0.4;
+			double pTrans = 0.0;
+			double pTotal = pSpec + pDiff + pTrans;
+
 			try{
+
+				//Specular reflection. 
+				//Reflect the photon and mark it as having undergone Caustic reflection.
+				if(russianRouletteRV<pSpec/pTotal){
+					/*
+					//Cast another ray in the reflected direction
+					Vector3 refDir = new Vector3(ray.direction);
+
+
+					Ray refRay = new Ray(sri_point, refDir);
+					iRec.frame.canonicalToFrame(refRay.direction);
+
+					//Reflect it.
+					//refRay.direction.scaleAdd(1.0,);
+
+					iRec.frame.frameToCanonical(refRay.direction);
+					ray.makeOffsetRay();
+					Photon diffPhoton = new Photon(currlight.power);
+					diffPhoton.power.scale(1.0/photonsPerLight);
+					castPhoton(diffDay,scene, diffPhoton);
+					*/
+				}
+					//Diffuse Reflection
+				else if(russianRouletteRV<(pSpec+pDiff)/pTotal){
+
+					/*
+					//Store this current photon in the global photon map.
+					photon.setPosition(sri_point);
+					kdt.insert(surface_and_ray_interaction_point,photon);
+
+					//Cast another ray in a random direction
+					Ray diffRay = new Ray(sri_point,currlight.sampleDirection());
+					diffRay.makeOffsetRay();
+					Photon diffPhoton = new Photon(currlight.power);
+					diffPhoton.power.scale(1.0/photonsPerLight);
+					castPhoton(diffRay,scene, diffPhoton);
+					*/
+				}
+					//Transmission
+				else if(russianRouletteRV<(pSpec+pDiff+pTrans)/pTotal){
+
+
+				}
+					//Absorption
+				else{
+					
+				}
 				photon.setPosition(sri_point);
 				kdt.insert(surface_and_ray_interaction_point,photon);
+
 			}catch(KeySizeException ksze){
 				System.err.println("");
 			}catch(KeyDuplicateException kde){
 				System.err.println("x");
 			}
-			//Russian Roulette to determine wheather photon undergoes
-			// absorption, reflection - specular or diffuse- or transmision.
-			double russianRouletteRV = randGenerator.nextDouble();
-
-			//Diffuse reflection
-
-			//Specular reflection
-
-			//Transmission
-
-			//Absorpion
 		}
 		//Ray did not meet any object. Do nothing.
 	}
@@ -142,6 +189,12 @@ public class PhotonMapRenderer implements Renderer {
 		if (scene.getFirstIntersection(iRec, ray)) {
 			
 			Point3 sri_point = iRec.frame.o;
+			Color outBSDFValue = new Color();
+
+			//Get the material properties at the point of intersection.
+			BSDF bsdf = iRec.surface.getMaterial().getBSDF(iRec);
+			bsdf.evaluate(iRec.frame,null,null,outBSDFValue);
+
 			double[] surface_and_ray_interaction_point = {sri_point.x,sri_point.y,sri_point.z};
 
 			double dist = 0.0;
@@ -154,9 +207,10 @@ public class PhotonMapRenderer implements Renderer {
 			}catch(KeySizeException ksze){
 				System.err.println("");
 			}
-			pow.scale(dist/10000);
+			pow.scale(1/dist*3000);
 			//System.out.println(pow);
-			outColor.set(pow);
+			outColor.set(outBSDFValue);
+			outColor.scale(pow);
 			return;
 		}
 		

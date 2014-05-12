@@ -49,8 +49,8 @@ public class Sphere extends Surface {
     }
     
     public void updateArea() {
-    	area = 4 * Math.PI * radius*radius;
-    	oneOverArea = 1. / area;
+        area = 4 * Math.PI * radius*radius;
+        oneOverArea = 1. / area;
     }
     
     /**
@@ -113,20 +113,73 @@ public class Sphere extends Surface {
      */
     public boolean intersect(IntersectionRecord outRecord, Ray ray) {
         // W4160 TODO (A)
-    	// In this function, you need to test if the given ray intersect with a sphere.
-    	// You should look at the intersect method in other classes such as ray.surface.Triangle.java
-    	// to see what fields of IntersectionRecord should be set correctly.
-    	// The following fields should be set in this function
-    	//     IntersectionRecord.t
-    	//     IntersectionRecord.frame
-    	//     IntersectionRecord.surface
-    	//
-    	// Note: Although a ray is conceptually a infinite line, in practice, it often has a length,
-    	//       and certain rendering algorithm relies on the length. Therefore, here a ray is a 
-    	//       segment rather than a infinite line. You need to test if the segment is intersect
-    	//       with the sphere. Look at ray.misc.Ray.java to see the information provided by a ray.
-    	
-        return false;
+        // In this function, you need to test if the given ray intersect with a sphere.
+        // You should look at the intersect method in other classes such as ray.surface.Triangle.java
+        // to see what fields of IntersectionRecord should be set correctly.
+        // The following fields should be set in this function
+        //     IntersectionRecord.t
+        //     IntersectionRecord.frame
+        //     IntersectionRecord.surface
+        //
+        // Note: Although a ray is conceptually a infinite line, in practice, it often has a length,
+        //       and certain rendering algorithm relies on the length. Therefore, here a ray is a 
+        //       segment rather than a infinite line. You need to test if the segment is intersect
+        //       with the sphere. Look at ray.misc.Ray.java to see the information provided by a ray.
+        
+        //Get the ray attributes.
+        double dx = ray.direction.x;
+        double dy = ray.direction.y;
+        double dz = ray.direction.z;
+        
+        double ex = ray.origin.x;
+        double ey = ray.origin.y;
+        double ez = ray.origin.z;
+        
+        //Some usefull vectors
+        Vector3 d = new Vector3( dx, dy, dz );
+        Vector3 e = new Vector3( ex, ey, ez );
+        
+        Vector3 e_c = new Vector3( ex - center.x, ey - center.y, ez - center.z );
+        
+        //Find out how many solutions are there from the discriminant.
+        double dec = d.dot( e_c );
+        double dsq = d.squaredLength();
+        double ecsq = e_c.squaredLength();
+        
+        double disc = dec*dec - dsq*(ecsq-radius*radius);
+        
+        //If the discriminant if negative, the squareroot is imaginary and the
+        //line and sphere do not intersect.
+        
+        if(disc < 0.0 )
+            return false;
+        
+        double t1 = (-dec - Math.sqrt( disc ))/dsq;
+        double t2 = (-dec + Math.sqrt( disc ))/dsq;
+        
+        //t1 < t2. We look only for solutions in range
+        if( t1 > ray.end || t2 < ray.start )
+            return false;
+            
+        //Get the point of intersection on the sphere that is closest point to the
+        //origin of the ray.
+        double t = t1 < ray.start ? t2 : t1;
+        
+        //Fill out the record
+        outRecord.t = t;
+        outRecord.surface = this;
+        
+        //Set the co-ordinate frame's origin.
+        Point3 ip = new Point3( ex, ey, ez );       //Intersection point
+        ip.scaleAdd( t , d );
+        outRecord.frame.o.set( ip.x , ip.y, ip.z );
+        
+        //Set the normal vector
+        outRecord.frame.w.set( ip.x - center.x, ip.y - center.y, ip.z - center.z );
+        outRecord.frame.initFromW();
+        
+        
+        return true;
     }
     
     /**
