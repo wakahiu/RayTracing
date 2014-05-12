@@ -1,5 +1,6 @@
 package ray.surface;
 
+import java.util.Random;
 import ray.accel.AxisAlignedBoundingBox;
 import ray.material.Material;
 import ray.math.Geometry;
@@ -8,6 +9,7 @@ import ray.math.Point3;
 import ray.math.Vector3;
 import ray.misc.IntersectionRecord;
 import ray.misc.LuminaireSamplingRecord;
+import ray.sampling.IndependentSampler;
 import ray.misc.Ray;
 
 /**
@@ -48,9 +50,79 @@ public class Sphere extends Surface {
         updateArea();
     }
     
+
+    //Siddhartha:   this function  finds a random point on the surface of the sphere and then
+    // generates a random normal Ray from it.
+    public Ray generateSurfaceNormalRay()
+    {
+
+        
+        Random random = new Random(1);
+
+        Vector3 seekDir = new Vector3();
+        Vector3 normDir = new Vector3();
+
+        // generate a random point 
+        Point2 directSeed = new Point2();
+
+        directSeed.set(random.nextDouble(), random.nextDouble());
+
+        // this seed is used for generating 'seekDir', a direction vector which would help us reach a surface 
+        //point on the sphere
+
+        //sampler.sample(0, 0, directSeed); 
+        Geometry.squareToPSAHemisphere(directSeed, seekDir);
+        seekDir.normalize();
+
+        normDir = seekDir;
+
+        seekDir.scale(this.radius);
+
+
+        Point3 generatedPoint = new Point3();
+
+        generatedPoint=seekDir.translate(this.center);
+
+        Ray generatedRay= new Ray(generatedPoint, normDir);
+
+        return generatedRay;
+
+    }
+
+    //Siddhartha:  this function generates a random from a point on the surface of the sphere with
+    // a spherical distribution
+
+    public Ray generateSurfaceRandomRay(Ray surfaceRay)
+    {
+
+        Random random = new Random(1);
+        Vector3 randomDir = new Vector3();
+        Ray generatedRay = new Ray(surfaceRay.origin, randomDir);
+
+        Point2 directSeed = new Point2();
+        //sampler.sample(0, 0, directSeed); 
+
+        directSeed.set(random.nextDouble(), random.nextDouble());
+        
+        Geometry.squareToPSAHemisphere(directSeed, randomDir);
+        randomDir.normalize();
+
+        double dotProduct = (surfaceRay.direction).dot(randomDir);
+        
+        if (dotProduct>0)
+        {
+          randomDir.scale(dotProduct);
+          generatedRay.set(surfaceRay.origin, randomDir);
+        }
+
+        return generatedRay;
+
+    }
+
+
     public void updateArea() {
-        area = 4 * Math.PI * radius*radius;
-        oneOverArea = 1. / area;
+    	area = 4 * Math.PI * radius*radius;
+    	oneOverArea = 1. / area;
     }
     
     /**
@@ -126,60 +198,93 @@ public class Sphere extends Surface {
         //       segment rather than a infinite line. You need to test if the segment is intersect
         //       with the sphere. Look at ray.misc.Ray.java to see the information provided by a ray.
         
-        //Get the ray attributes.
-        double dx = ray.direction.x;
-        double dy = ray.direction.y;
-        double dz = ray.direction.z;
+        //return false;
         
-        double ex = ray.origin.x;
-        double ey = ray.origin.y;
-        double ez = ray.origin.z;
+        /*sc3653 - TODO(A)
+        reference - P. Shirley (fundamental of graphics)
+         
+         
+         Given - ray (e + td)
+                sphere with center 'c' and radius 'r'
+         
+         algorithm:
+         
+         1. calculate e_c= (e-c)
+         2. find discriminant (del) of "At^2 + Bt + C=0", where:
+            -> A = (d.d)
+            -> B = 2* d.e_c
+            -> C = (e_c).(e_c) - r^2
+         
+         3. if 'del' <0, return false
+         4. else, compute t(1/2)= [-B (-/+) sqrt(B^2 - 4AC)]/2A
+         5. if t1 lies between ray.start and ray.end, t=t1
+            else if t2 lies between ray.start and ray.end, t=t2
+         6. set outRecord.t, outRecord.frame, outRecord.surface
+         
+         
+        */
         
-        //Some usefull vectors
-        Vector3 d = new Vector3( dx, dy, dz );
-        Vector3 e = new Vector3( ex, ey, ez );
         
-        Vector3 e_c = new Vector3( ex - center.x, ey - center.y, ez - center.z );
+        Vector3 e_c =new Vector3();
+        Point3 e=ray.origin;
+        Vector3 d= ray.direction;
         
-        //Find out how many solutions are there from the discriminant.
-        double dec = d.dot( e_c );
-        double dsq = d.squaredLength();
-        double ecsq = e_c.squaredLength();
+        Point3 c=this.center;
+        double r= this.radius;
         
-        double disc = dec*dec - dsq*(ecsq-radius*radius);
+        //step 1
+        e_c.sub(e,c);
         
-        //If the discriminant if negative, the squareroot is imaginary and the
-        //line and sphere do not intersect.
+        double A= d.dot(d);
+        double B= 2 * e_c.dot(d);
+        double C= (e_c).dot(e_c) - r*r ;
         
-        if(disc < 0.0 )
+        
+        //step 2
+        double del= B*B - 4 * A * C;
+        
+        //step 3
+        if(del<0)
             return false;
         
-        double t1 = (-dec - Math.sqrt( disc ))/dsq;
-        double t2 = (-dec + Math.sqrt( disc ))/dsq;
+        //step 4
+        double t=0;
+        double t1= (-B - Math.sqrt(del))/ (2 * A);
+        double t2= (-B + Math.sqrt(del))/ (2 * A);
         
-        //t1 < t2. We look only for solutions in range
-        if( t1 > ray.end || t2 < ray.start )
+        
+
+        if (t1>t2)
+        {
+            
+            t1= t1+t2;
+            t2=t1-t2;
+            t1 =t1-t2;
+        }
+        
+        
+        //step 5
+        if (t1>= ray.start && t1<=ray.end)
+            t=t1;
+        else if(t2>= ray.start && t2<=ray.end)
+            t=t2;
+        else
             return false;
             
-        //Get the point of intersection on the sphere that is closest point to the
-        //origin of the ray.
-        double t = t1 < ray.start ? t2 : t1;
         
-        //Fill out the record
-        outRecord.t = t;
-        outRecord.surface = this;
-        
-        //Set the co-ordinate frame's origin.
-        Point3 ip = new Point3( ex, ey, ez );       //Intersection point
-        ip.scaleAdd( t , d );
-        outRecord.frame.o.set( ip.x , ip.y, ip.z );
-        
-        //Set the normal vector
-        outRecord.frame.w.set( ip.x - center.x, ip.y - center.y, ip.z - center.z );
+        //step 6
+        outRecord.t=t;
+        ray.evaluate(outRecord.frame.o,t);
+        outRecord.frame.w.sub(outRecord.frame.o,c);
+        outRecord.frame.w.normalize();
         outRecord.frame.initFromW();
         
+        outRecord.surface=this;
         
         return true;
+        
+        
+        
     }
     
     /**

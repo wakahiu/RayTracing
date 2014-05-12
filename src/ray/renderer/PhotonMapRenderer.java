@@ -161,8 +161,7 @@ public class PhotonMapRenderer implements Renderer {
 
 				}
 					//Absorption
-				else{
-					
+				else{	
 				}
 				photon.setPosition(sri_point);
 				kdt.insert(surface_and_ray_interaction_point,photon);
@@ -184,7 +183,7 @@ public class PhotonMapRenderer implements Renderer {
 		// find if the ray intersect with any surface
 		IntersectionRecord iRec = new IntersectionRecord();
 
-		float length = 0.1f;
+		int numNear = 50;
 		
 		if (scene.getFirstIntersection(iRec, ray)) {
 			
@@ -197,19 +196,28 @@ public class PhotonMapRenderer implements Renderer {
 
 			double[] surface_and_ray_interaction_point = {sri_point.x,sri_point.y,sri_point.z};
 
-			double dist = 0.0;
+			double distSq = 0.0;
 			Color pow = new Color();
-			Photon ph;
+			
+			Object [] objPhotons;
+
 			try{
-				ph = (Photon)kdt.nearest(surface_and_ray_interaction_point);
-				dist = ph.position.distanceSquared(sri_point);
-				pow.set( ph.power );
+
+				objPhotons = kdt.nearest(surface_and_ray_interaction_point,numNear);
+
+				float MaxDist = 0;
+				for(int i = 0; i < numNear ; i++){
+					pow.add( ((Photon)objPhotons[i]).power );
+				}
+				distSq = ((Photon)objPhotons[numNear-1]).position.distanceSquared(sri_point);
+
 			}catch(KeySizeException ksze){
 				System.err.println("");
 			}
-			pow.scale(1/dist*3000);
+			pow.scale(1/distSq*30000);
 			//System.out.println(pow);
 			outColor.set(outBSDFValue);
+			
 			outColor.scale(pow);
 			return;
 		}

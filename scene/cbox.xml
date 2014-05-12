@@ -10,7 +10,7 @@
   </sampler>
 
   <renderer type="PhotonMapRenderer">
-    <photonsPerLight>100000</photonsPerLight>
+    <photonsPerLight>1000000</photonsPerLight>
   </renderer>
 
   <light type="PointLight">
