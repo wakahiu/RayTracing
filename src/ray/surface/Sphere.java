@@ -1,5 +1,6 @@
 package ray.surface;
 
+import java.util.Random;
 import ray.accel.AxisAlignedBoundingBox;
 import ray.material.Material;
 import ray.math.Geometry;
@@ -8,6 +9,7 @@ import ray.math.Point3;
 import ray.math.Vector3;
 import ray.misc.IntersectionRecord;
 import ray.misc.LuminaireSamplingRecord;
+import ray.sampling.IndependentSampler;
 import ray.misc.Ray;
 
 /**
@@ -55,17 +57,20 @@ public class Sphere extends Surface {
     {
 
         
+        Random random = new Random(1);
 
         Vector3 seekDir = new Vector3();
-        Vector3 normDir = new Vector3()
+        Vector3 normDir = new Vector3();
 
         // generate a random point 
         Point2 directSeed = new Point2();
 
+        directSeed.set(random.nextDouble(), random.nextDouble());
+
         // this seed is used for generating 'seekDir', a direction vector which would help us reach a surface 
         //point on the sphere
 
-        sampler.sample(0, 0, directSeed); 
+        //sampler.sample(0, 0, directSeed); 
         Geometry.squareToPSAHemisphere(directSeed, seekDir);
         seekDir.normalize();
 
@@ -86,16 +91,19 @@ public class Sphere extends Surface {
 
     //Siddhartha:  this function generates a random from a point on the surface of the sphere with
     // a spherical distribution
-    
+
     public Ray generateSurfaceRandomRay(Ray surfaceRay)
     {
 
-        
+        Random random = new Random(1);
         Vector3 randomDir = new Vector3();
         Ray generatedRay = new Ray(surfaceRay.origin, randomDir);
 
         Point2 directSeed = new Point2();
-        sampler.sample(0, 0, directSeed); 
+        //sampler.sample(0, 0, directSeed); 
+
+        directSeed.set(random.nextDouble(), random.nextDouble());
+        
         Geometry.squareToPSAHemisphere(directSeed, randomDir);
         randomDir.normalize();
 
