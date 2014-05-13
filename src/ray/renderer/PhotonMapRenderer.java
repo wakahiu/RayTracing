@@ -60,7 +60,7 @@ public class PhotonMapRenderer implements Renderer {
 
 		//Cast photons into the scene. 
 		//TODO Using some kind of importance sampling to bias towards scene objects?
-		while(luminairesIter.hasNext()){
+	while(luminairesIter.hasNext()){
 			
 			System.err.println("Implement surface luminaires!");
 			Surface currLight = luminairesIter.next();
@@ -69,8 +69,20 @@ public class PhotonMapRenderer implements Renderer {
 				//Cast the photon into the scene.
 				//Get it's interacting with the scene.
 				//Store it in a photon map.
-				Ray ray = currLight.chooseSampleRay();
-				LuminaireSamplingRecord lRec = new LuminaireSamplingRecord();
+
+				//Get center of luminaire surface
+				Point3 debugCenter = new Point3();
+				currLight.getCenter(debugCenter);
+
+
+				//Generate a random Luminaire sampling record
+				Point2 directSeed = new Point2();
+				directSeed.set(randGenerator.nextDouble(),randGenerator.nextDouble());
+       			LuminaireSamplingRecord lRec = new LuminaireSamplingRecord();
+       			currLight.chooseSamplePoint(debugCenter, directSeed, lRec);
+
+				Ray ray = currLight.chooseSampleRay(lRec);
+				ray.makeOffsetRay();
 				Color power = new Color(1.0,1.0,0.0);
 				currLight.getMaterial().emittedRadiance(lRec,power);
 				Photon photon = new Photon(power);
