@@ -15,6 +15,7 @@ public class Transparent implements BTDF {
     
     // The material's trasmitance (the fraction of incident irradiance transmitted, for any incident distribution).
     private Color transmittance = new Color(0.0, 0.0, 0.0);
+    private Color refraciveIndex = new Color(1.0, 1.0, 1.0);
     
     // For the benefit of the parser
     public Transparent() { }
@@ -37,10 +38,15 @@ public class Transparent implements BTDF {
         outWeight.set(transmittance);
     }
 
-    public void getComponets(Color specReflectance, Color diffReflectance, Color transmittance){
+    public void setRefractiveIndex(Color refraciveIndex) { 
+        this.refraciveIndex.set(refraciveIndex); 
+    }
+
+    public void getComponets(Color specReflectance, Color diffReflectance, Color transmittance,Color refraciveIndex){
         specReflectance.set(  new Color() );
         diffReflectance.set(  new Color()  );
         transmittance.set( transmittance );
+        refraciveIndex.set(this.refraciveIndex);
     }
 
     /**

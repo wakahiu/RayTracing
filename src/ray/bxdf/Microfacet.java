@@ -53,10 +53,11 @@ public class Microfacet implements BRDF {
         this.specularSamplingWeight = specularSamplingWeight; 
     }
 
-    public void getComponets(Color specReflectance, Color diffReflectance, Color transmittance){
+    public void getComponets(Color specReflectance, Color diffReflectance, Color transmittance,Color refraciveIndex){
         specReflectance.set(  new Color() );
         diffReflectance.set(  diffuseBrdf  );
         transmittance.set( new Color() );
+        refraciveIndex.set( new Color(1.0,1.0,1.0) );
     }
 
     private Random random = new Random();

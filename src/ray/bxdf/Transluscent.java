@@ -19,6 +19,7 @@ public class Transluscent implements BSDF {
     // The material's diffuse and specular reflectance (the fraction of incident irradiance reflected, for any incident distribution).
     private Color specReflectance = new Color(0.0, 0.0, 0.0);
     private Color diffReflectance = new Color(0.0, 0.0, 0.0);
+    private Color refraciveIndex = new Color(1.0, 1.0, 1.0);
     
     // For the benefit of the parser
     public Transluscent() { }
@@ -28,10 +29,11 @@ public class Transluscent implements BSDF {
         this.diffReflectance.set(diffReflectance); 
     }
 
-    public void getComponets(Color specReflectance, Color diffReflectance, Color transmittance){
+    public void getComponets(Color specReflectance, Color diffReflectance, Color transmittance,Color refraciveIndex){
         specReflectance.set(this.specReflectance);
         diffReflectance.set(this.diffReflectance);
         transmittance.set(this.transmittance);
+        refraciveIndex.set(this.refraciveIndex);
 
     }
 
@@ -45,6 +47,10 @@ public class Transluscent implements BSDF {
 
     public void setDiffReflectance(Color diffReflectance) { 
         this.diffReflectance.set(diffReflectance); 
+    }
+
+    public void setRefractiveIndex(Color refraciveIndex) { 
+        this.refraciveIndex.set(refraciveIndex); 
     }
 
     public Color getSpecReflectance(){return this.specReflectance;}

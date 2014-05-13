@@ -19,7 +19,7 @@
 -->
 
   <renderer type="PhotonMapRenderer">
-    <photonsPerLight>10000</photonsPerLight>
+    <photonsPerLight>100000</photonsPerLight>
   </renderer>
 
 
@@ -28,7 +28,7 @@
     <eye>278.0 273.0 -800.0</eye>
     <target>278.0 273.0 0</target>
     <up>0 1 0</up>
-    <yFOV>80</yFOV>
+    <yFOV>40</yFOV>
   </camera>
 
   <material name="white" type="Homogeneous">
@@ -92,6 +92,7 @@
       <specReflectance>0.05 0.05 0.05</specReflectance>
       <diffReflectance>0.01 0.01 0.01</diffReflectance>
       <transmittance>0.93 0.93 0.93</transmittance>
+      <refractiveIndex>1.62 1.61 1.60</refractiveIndex>
     </bsdf>
   </material>
 
@@ -130,6 +131,12 @@
   <surface type="Sphere">
     <material ref="light" />
     <center>278.0 300.0 0</center>
+    <radius>20</radius>
+  </surface>
+
+  <surface type="Sphere">
+    <material ref="light" />
+    <center>450.0 200.0 0</center>
     <radius>10</radius>
   </surface>
 
@@ -147,7 +154,7 @@
 
   <surface type="Sphere">
     <material ref="glass" />
-    <center>378.0 62.0 0</center>
+    <center>378.0 62.0 100</center>
     <radius>70.0</radius>
   </surface>
 

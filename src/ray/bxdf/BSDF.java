@@ -27,7 +27,7 @@ public interface BSDF {
      * @param diffReflectance The diffuse reflectance
      * @param transmittance The transmitance
      */
-    public void getComponets(Color specReflectance, Color diffReflectance, Color transmittance);
+    public void getComponets(Color specReflectance, Color diffReflectance, Color transmittance,Color refraciveIndex);
 
     /**
      * Evaluate the BSDF.  Must be reciprocal (invariant to swapping arguments).

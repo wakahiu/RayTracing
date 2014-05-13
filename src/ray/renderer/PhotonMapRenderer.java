@@ -126,8 +126,9 @@ public class PhotonMapRenderer implements Renderer {
 			Color specReflectance = new Color();
 			Color diffReflectance  = new Color();
 			Color transmittance  = new Color();
+			Color refraciveIndex  = new Color();
 
-			bsdf.getComponets(specReflectance, diffReflectance, transmittance);
+			bsdf.getComponets(specReflectance, diffReflectance, transmittance,refraciveIndex);
 
 			//Frensel approximation?
 
@@ -162,7 +163,6 @@ public class PhotonMapRenderer implements Renderer {
 					double z = reffDir.z;
 
 					reffDir.set(x,y,-z);
-
 
 					iRec.frame.frameToCanonical(reffDir);
 
@@ -210,7 +210,38 @@ public class PhotonMapRenderer implements Renderer {
 					//Transmission
 				else if(russianRouletteRV<(pSpec+pDiff+pTrans)){
 
+					//Create a ray in a in  the direction of transmission
+					Vector3 incDir = new Vector3(ray.direction);
+
+					//Reverse its direction
+					incDir.scale(-1);
+
+					//Reorient the direction to have its base aligned to the tangent plane of the surface
+					Vector3 normal = new Vector3(iRec.frame.w);
+					//normal.normalize();
+					//incDir.normalize();
+
+					Vector3 norm_x_inc = new Vector3();
+
+					norm_x_inc.cross(incDir,normal);
+
+					double sin_norm_inc = norm_x_inc.length();
+
+
 					Vector3 transDir = new Vector3(ray.direction);
+
+					//Reorient the direction to have its base aligned to the tangent plane of the surface
+					iRec.frame.canonicalToFrame(transDir);
+
+					//Cross the normal vector to the incident vector to get the sin of the angle
+					//between them.
+					double x = transDir.x*sin_norm_inc;
+					double y = transDir.y*sin_norm_inc;
+					double z = transDir.z*sin_norm_inc;
+
+					transDir.set(x,y,z);
+
+					iRec.frame.frameToCanonical(transDir);
 
 					//Cast another ray in a random direction in the hemisphere above the surface.
 					Ray transRay = new Ray(sri_point, transDir);
@@ -256,6 +287,17 @@ public class PhotonMapRenderer implements Renderer {
 			Point3 sri_point = iRec.frame.o;
 			Color outBSDFValue = new Color();
 
+			//Get the material properties at the point of intersection
+			Material material = iRec.surface.getMaterial();
+			BSDF bsdf = material.getBSDF(iRec);
+			bsdf.evaluate(iRec.frame,null,null,outBSDFValue);
+			
+			if(material.isEmitter()){
+				Color outRadiance = new Color();
+				material.emittedRadiance(null,outRadiance);
+				outBSDFValue.add(outRadiance);
+			}
+
 			double[] surface_and_ray_interaction_point = {sri_point.x,sri_point.y,sri_point.z};
 
 			double distSq = 0.0;
@@ -264,14 +306,12 @@ public class PhotonMapRenderer implements Renderer {
 			Object [] objPhotons;
 
 			//Get the material properties at the point of intersection.
-			BSDF bsdf = iRec.surface.getMaterial().getBSDF(iRec);
 			Color specReflectance = new Color();
 			Color diffReflectance  = new Color();
 			Color transmittance  = new Color();
+			Color refraciveIndex  = new Color();
 
-			bsdf.getComponets(specReflectance, diffReflectance, transmittance);
-
-			bsdf.evaluate(iRec.frame,null,null,outBSDFValue);
+			bsdf.getComponets(specReflectance, diffReflectance, transmittance,refraciveIndex);
 
 			//Get the specular reflection of the material.
 			//Get the diffuse reflection propeties of the material
@@ -353,25 +393,44 @@ public class PhotonMapRenderer implements Renderer {
 				else if(russianRouletteRV<(pSpec+pDiff+pTrans)){
 
 					//Create a ray in a in  the direction of transmission
+					Vector3 incDir = new Vector3(ray.direction);
+
+					//Reverse its direction
+					incDir.scale(-1);
+
+					//Reorient the direction to have its base aligned to the tangent plane of the surface
+					Vector3 normal = new Vector3(iRec.frame.w);
+					//normal.normalize();
+					//incDir.normalize();
+
+					Vector3 norm_x_inc = new Vector3();
+
+					norm_x_inc.cross(incDir,normal);
+
+					double sin_norm_inc = norm_x_inc.length();
+
+					//Create a ray in a in  the direction of transmission
 					Vector3 transDir = new Vector3(ray.direction);
 
 					//Reorient the direction to have its base aligned to the tangent plane of the surface
 					iRec.frame.canonicalToFrame(transDir);
 
-					double x = transDir.x;
-					double y = transDir.y;
-					double z = transDir.z;
+					double x = transDir.x*sin_norm_inc;
+					double y = transDir.y*sin_norm_inc;
+					double z = transDir.z*sin_norm_inc;
 
-					transDir.set(x*0.8,y*0.8,z);
+					//Vector3 normal = new vector(iRec.frame.w);
+
+					transDir.set(x,y,z);
 
 					iRec.frame.frameToCanonical(transDir);
 
-					//Create the ray emainating from the point on intersection oriented in the 
+					//Create the ray emanating from the point of intersection oriented in the 
 					//direction of reflection.
 					Ray transRay = new Ray(sri_point, transDir);
 					transRay.makeOffsetRay();
 
-					//Castt 
+					//Cast the ray
 					rayRadiance(scene, transRay, sampler, sampleIndex, outColor);
 					//outColor.set(1.0,1.0,0.0);
 					return;
@@ -393,11 +452,12 @@ public class PhotonMapRenderer implements Renderer {
 			}catch(KeySizeException ksze){
 				System.err.println("");
 			}
-			pow.scale(1.0/distSq*10000);
+			pow.scale(1.0/distSq*30000);
 			//System.out.println(pow);
 			outColor.set(outBSDFValue);
 			
 			outColor.scale(pow);
+
 			return;
 		}
 		
