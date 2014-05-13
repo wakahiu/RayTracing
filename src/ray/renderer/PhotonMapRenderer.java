@@ -142,7 +142,7 @@ public class PhotonMapRenderer implements Renderer {
 
 			bsdf.getComponets(specReflectance, diffReflectance, transmittance,refraciveIndex);
 
-			//Frensel approximation?
+			//Fresnel approximation?
 
 			//Get the specular reflection of the material.
 			//Get the diffuse reflection propeties of the material
@@ -225,13 +225,54 @@ public class PhotonMapRenderer implements Renderer {
 					/// Sid play with this
 				else if(russianRouletteRV<(pSpec+pDiff+pTrans)){
 
+
+					//Sid part -- debug
+
+					//reference: http://www.starkeffects.com/snells-law-vector.shtml
+
+					Vector3 n = new Vector3(iRec.frame.w);
+					Vector3 _n= n;
+					_n.scale(-1);
+
+					double eta_1__eta2 = 1/1.45;
+					double eta1__eta2_2 = eta_1__eta2 * eta_1__eta2;
+
+					Vector3 s= new Vector3(ray.direction);
+
+
+					Vector3 operand1 = new Vector3();
+					operand1.cross(_n, s);
+					operand1.cross(n, operand1);
+					operand1.scale(eta_1__eta2);
+
+					
+					Vector3 sub_op = new Vector3();
+					sub_op.cross(n,s);
+
+					double scaleFactor = sub_op.dot(sub_op);
+					scaleFactor = scaleFactor * eta1__eta2_2;
+					scaleFactor = 1- scaleFactor;
+					scaleFactor= Math.sqrt(scaleFactor);
+
+					Vector3 operand2 = n;
+					n.scale(scaleFactor);
+
+					Vector3 transmitDir = operand1;
+					transmitDir.sub(operand2);
+					transmitDir.normalize();
+					//Sid part ends
+
+
+
+
+
 					//Transmitted ray.
-					Vector3 transDir = new Vector3(ray.direction);
-					transDir.normalize();
+					Vector3 transDir = new Vector3(ray.direction);  //Comment by Sid: transmitDir is used instead of this - 13th May
+					//transDir.normalize();
 
 					//Reorient the direction to have its base aligned to the tangent plane of the surface
 					Vector3 normal = new Vector3(iRec.frame.w);
-					normal.normalize();
+					//normal.normalize();
 
 					//Create a ray in  the direction of transmission
 					Vector3 incDir = new Vector3(ray.direction);
@@ -250,6 +291,11 @@ public class PhotonMapRenderer implements Renderer {
 						//return;
 					}
 					
+
+
+
+
+
 					//The x,y components of new transmited ray.
 					Vector3 norm_x_inc = new Vector3();
 
@@ -257,7 +303,7 @@ public class PhotonMapRenderer implements Renderer {
 
 					double sinTheta1 = norm_x_inc.length();
 
-					double cosTheta2Sq = 1 - (1.0/1.6*sinTheta1); 
+					double cosTheta2Sq = 1.0 - (1.0/1.6*sinTheta1); 
 
 					double x = transDir.x;
 					double y = transDir.y;
@@ -283,7 +329,8 @@ public class PhotonMapRenderer implements Renderer {
 					}
 
 					//Cast another ray in a random direction in the hemisphere above the surface.
-					Ray transRay = new Ray(sri_point, transDir);
+					//Ray transRay = new Ray(sri_point, transDir); //Sid comment : May 13
+					Ray transRay = new Ray(sri_point, transmitDir);
 					transRay.makeOffsetRay();
 
 					//Finally create a photon and cast it.
