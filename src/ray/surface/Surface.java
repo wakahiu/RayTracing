@@ -1,13 +1,17 @@
 package ray.surface;
 
 import java.util.Comparator;
+import java.util.Random;
 
+
+import ray.misc.LuminaireSamplingRecord;
+import ray.math.Geometry;
 import ray.material.Material;
 import ray.misc.IntersectionRecord;
-import ray.misc.LuminaireSamplingRecord;
 import ray.misc.Ray;
 import ray.math.Point2;
 import ray.math.Point3;
+import ray.math.Vector3;
 import ray.accel.AxisAlignedBoundingBox;
 
 /**
@@ -27,6 +31,10 @@ public abstract class Surface {
     public static final SurfaceComparator Y_COMPARE = new SurfaceComparator(SurfaceComparator.Y_AXIS);
     public static final SurfaceComparator Z_COMPARE = new SurfaceComparator(SurfaceComparator.Z_AXIS);
     
+
+    /* Added -Sid: May 12 */
+    private Random randGen = new Random();
+
     /** total surface area */
     protected double area = 0;
     protected double oneOverArea = 0;
@@ -80,7 +88,39 @@ public abstract class Surface {
     /**
      * Choose a ray emanating from a random point on the surface in a random direction
      */
-    public abstract Ray chooseSampleRay( );
+
+    //Siddhartha: This makes generated generateSurfaceRandomRay and generateSurfaceNormalRay obsolete
+    public Ray chooseSampleRay(LuminaireSamplingRecord lRec)
+    {
+
+        
+        //ray = generateSurfaceRandomRay(ray);
+
+        Vector3 randomDir = new Vector3();
+        Point2 directSeed = new Point2();
+        
+        directSeed.set(randGen.nextDouble(), randGen.nextDouble());
+        Geometry.squareToPSAHemisphere(directSeed, randomDir);
+        randomDir.normalize();
+
+        double dotProduct = lRec.frame.w.dot(randomDir);
+        
+        if (dotProduct<0)
+        {
+            randomDir.scale(-1);
+
+        }
+
+
+        Ray generatedRay = new Ray(lRec.frame.o, randomDir);
+        //generatedRay.makeOffsetRay();
+        return generatedRay;
+        
+
+        //return ray;
+
+    }
+    
 
     /**
      * The pdf corresponding to chooseSamplePoint.  

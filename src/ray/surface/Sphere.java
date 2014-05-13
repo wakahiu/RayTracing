@@ -19,8 +19,7 @@ import ray.misc.Ray;
  */
 public class Sphere extends Surface {
     
-    /* Added -Sid: May 12 */
-    private Random randSphere = new Random();
+    
 
     /** Material for this sphere. */
     protected Material material = Material.DEFAULT_MATERIAL;
@@ -56,86 +55,100 @@ public class Sphere extends Surface {
 
     //Siddhartha:   this function  finds a random point on the surface of the sphere and then
     // generates a random normal Ray from it.
-    public Ray generateSurfaceNormalRay()
-    {
+    // public Ray generateSurfaceNormalRay()
+    // {
 
         
-        //Random random = new Random();
+    //     //Random random = new Random();
 
-        Vector3 seekDir = new Vector3();
+    //     Vector3 seekDir = new Vector3();
         
-        // generate a random point 
-        Point2 directSeed = new Point2();
+    //     // generate a random point 
+    //     Point2 directSeed = new Point2();
 
 
-        directSeed.set(randSphere.nextDouble(),randSphere.nextDouble());
-        //seekDir.set(randSphere.nextDouble(), randSphere.nextDouble(),randSphere.nextDouble());
+    //     directSeed.set(randSphere.nextDouble(),randSphere.nextDouble());
+    //     //seekDir.set(randSphere.nextDouble(), randSphere.nextDouble(),randSphere.nextDouble());
            
 
-        // this seed is used for generating 'seekDir', a direction vector which would help us reach a surface 
-        //point on the sphere
+    //     // this seed is used for generating 'seekDir', a direction vector which would help us reach a surface 
+    //     //point on the sphere
 
-        //sampler.sample(0, 0, directSeed); 
-        Geometry.squareToHemisphere(directSeed, seekDir);
+    //     //sampler.sample(0, 0, directSeed); 
+    //     Geometry.squareToHemisphere(directSeed, seekDir);
         
 
-        seekDir.normalize();
-        //seekDir.scale(this.radius);
+    //     seekDir.normalize();
+    //     //seekDir.scale(this.radius);
 
-        Point3 surfacePoint = new Point3();        
-        Ray generatedRay= new Ray(this.center, seekDir);
-        generatedRay.evaluate(surfacePoint, this.radius);
+    //     Point3 surfacePoint = new Point3();        
+    //     Ray generatedRay= new Ray(this.center, seekDir);
+    //     generatedRay.evaluate(surfacePoint, this.radius);
 
-        generatedRay.set(surfacePoint,seekDir);
+    //     generatedRay.set(surfacePoint,seekDir);
 
-        return generatedRay;
+    //     return generatedRay;
 
-    }
+    // }
 
     //Siddhartha:  this function generates a random from a point on the surface of the sphere with
     // a spherical distribution
 
-    public Ray generateSurfaceRandomRay(Ray surfaceRay)
-    {
+    // public Ray generateSurfaceRandomRay(Ray surfaceRay)
+    // {
 
 
-        Vector3 randomDir = new Vector3();
-        Point2 directSeed = new Point2();
+    //     Vector3 randomDir = new Vector3();
+    //     Point2 directSeed = new Point2();
         
-        directSeed.set(randSphere.nextDouble(), randSphere.nextDouble());
-        Geometry.squareToPSAHemisphere(directSeed, randomDir);
-        randomDir.normalize();
+    //     directSeed.set(randSphere.nextDouble(), randSphere.nextDouble());
+    //     Geometry.squareToPSAHemisphere(directSeed, randomDir);
+    //     randomDir.normalize();
 
-        double dotProduct = (surfaceRay.direction).dot(randomDir);
+    //     double dotProduct = (surfaceRay.direction).dot(randomDir);
         
-        if (dotProduct<0)
-        {
-            randomDir.scale(-1);
+    //     if (dotProduct<0)
+    //     {
+    //         randomDir.scale(-1);
 
-        }
+    //     }
 
 
-        Ray generatedRay = new Ray(surfaceRay.origin, randomDir);
-        generatedRay.makeOffsetRay();
-        return generatedRay;
+    //     Ray generatedRay = new Ray(surfaceRay.origin, randomDir);
+    //     generatedRay.makeOffsetRay();
+    //     return generatedRay;
 
-    }
+    // }
 
-    public Ray chooseSampleRay(){
-        Ray ray = generateSurfaceNormalRay();
+    // //Siddhartha: This makes generated generateSurfaceRandomRay and generateSurfaceNormalRay obsolete
+    // public Ray chooseSampleRay(LuminaireSamplingRecord lrec){
+        
+    //     //ray = generateSurfaceRandomRay(ray);
 
-        //System.out.println(" Ray origin x" +ray.origin.x + " Ray origin y" +ray.origin.y);
-        //System.out.println(" Ray direction x" +ray.direction.x + " Ray direction y" +ray.direction.y + " Ray direction z" +ray.direction.z); 
+    //     Vector3 randomDir = new Vector3();
+    //     Point2 directSeed = new Point2();
+        
+    //     directSeed.set(randSphere.nextDouble(), randSphere.nextDouble());
+    //     Geometry.squareToPSAHemisphere(directSeed, randomDir);
+    //     randomDir.normalize();
 
-        //System.out.println("End of one part");
-        ray = generateSurfaceRandomRay(ray);
+    //     double dotProduct = (lRec.frame.w).dot(randomDir);
+        
+    //     if (dotProduct<0)
+    //     {
+    //         randomDir.scale(-1);
 
-        //System.out.println(" Ray origin x" +ray.origin.x + " Ray origin y" +ray.origin.y);
-        //System.out.println(" Ray direction x" +ray.direction.x + " Ray direction y" +ray.direction.y + " Ray direction z" +ray.direction.z); 
+    //     }
 
-        return ray;
 
-    }
+    //     Ray generatedRay = new Ray(lRec.frame.o, randomDir);
+    //     //generatedRay.makeOffsetRay();
+    //     return generatedRay;
+        
+
+    //     //return ray;
+
+    // }
 
 
     public void updateArea() {
