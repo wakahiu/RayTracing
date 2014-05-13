@@ -220,53 +220,76 @@ public class PhotonMapRenderer implements Renderer {
 					
 				}
 					//Transmission
+					//
+					//
+					/// Sid play with this
 				else if(russianRouletteRV<(pSpec+pDiff+pTrans)){
 
-					//Create a ray in a in  the direction of transmission
-					Vector3 incDir = new Vector3(ray.direction);
-
-					//Reverse its direction
-					incDir.scale(-1);
+					//Transmitted ray.
+					Vector3 transDir = new Vector3(ray.direction);
+					transDir.normalize();
 
 					//Reorient the direction to have its base aligned to the tangent plane of the surface
 					Vector3 normal = new Vector3(iRec.frame.w);
-					//normal.normalize();
-					//incDir.normalize();
+					normal.normalize();
 
+					//Create a ray in  the direction of transmission
+					Vector3 incDir = new Vector3(ray.direction);
+					//Reverse its direction
+					incDir.scale(-1);
+
+					double cosTheta1 = normal.dot(incDir);
+
+					
+					if(cosTheta1 < 0){
+						System.out.println("Bad things happened!");
+						//outColor.set(1.0,1.0,0.0);
+						//return;
+					}else{
+						//outColor.set(1.0,0.0,1.0);
+						//return;
+					}
+					
+					//The x,y components of new transmited ray.
 					Vector3 norm_x_inc = new Vector3();
 
 					norm_x_inc.cross(incDir,normal);
 
-					double sin_norm_inc = norm_x_inc.length();
+					double sinTheta1 = norm_x_inc.length();
 
+					double cosTheta2Sq = 1 - (1.0/1.6*sinTheta1); 
 
-					Vector3 transDir = new Vector3(ray.direction);
-
-					//Reorient the direction to have its base aligned to the tangent plane of the surface
-					iRec.frame.canonicalToFrame(transDir);
-
-					//Cross the normal vector to the incident vector to get the sin of the angle
-					//between them.
-					double x = transDir.x*sin_norm_inc;
-					double y = transDir.y*sin_norm_inc;
-					double z = transDir.z*sin_norm_inc;
-
+					double x = transDir.x;
+					double y = transDir.y;
+					double z = Math.sqrt( (x*x + y*y)/(1.0/cosTheta2Sq -1.0 ));
 					transDir.set(x,y,z);
-
-					iRec.frame.frameToCanonical(transDir);
-
-					//Cast another ray in a random direction in the hemisphere above the surface.
-					Ray transRay = new Ray(sri_point, transDir);
-					transRay.makeOffsetRay();
 
 					//Readjust power to account for probability of survival
 					Color outPower = new Color(photon.power);
 					outPower.invScale( pTrans );
 					outPower.scale(transmittance);
 
-					//Finally create a photon and cast it.
+					outPower.set(1.0e-3,1.0e-3,0.0);
+
+					//Query the refractive index in which the photon is propagating.
+					Color prevRefIdx = photon.getRefIdx();
 					Photon transPhoton = new Photon( outPower );
+
+					if(prevRefIdx.eq(refraciveIndex)){
+						//Exiting the surface
+						transPhoton.resetRefIdx();
+					}else{
+						transPhoton.setRefIdx(refraciveIndex);
+					}
+
+					//Cast another ray in a random direction in the hemisphere above the surface.
+					Ray transRay = new Ray(sri_point, transDir);
+					transRay.makeOffsetRay();
+
+					//Finally create a photon and cast it.
 					castPhoton(transRay,scene, transPhoton);
+
+					//---- end play
 				}
 					//Absorption
 				else{
@@ -404,38 +427,45 @@ public class PhotonMapRenderer implements Renderer {
 					//Transmission
 				else if(russianRouletteRV<(pSpec+pDiff+pTrans)){
 
-					//Create a ray in a in  the direction of transmission
-					Vector3 incDir = new Vector3(ray.direction);
-
-					//Reverse its direction
-					incDir.scale(-1);
+					//Transmitted ray.
+					Vector3 transDir = new Vector3(ray.direction);
+					transDir.normalize();
 
 					//Reorient the direction to have its base aligned to the tangent plane of the surface
 					Vector3 normal = new Vector3(iRec.frame.w);
-					//normal.normalize();
-					//incDir.normalize();
+					normal.normalize();
 
+					//Create a ray in  the direction of transmission
+					Vector3 incDir = new Vector3(ray.direction);
+					//Reverse its direction
+					incDir.scale(-1);
+
+					double cosTheta1 = normal.dot(incDir);
+
+					
+					if(cosTheta1 < 0){
+						System.out.println("Bad things happened!");
+						//outColor.set(1.0,1.0,0.0);
+						//return;
+					}else{
+						//outColor.set(1.0,0.0,1.0);
+						//return;
+					}
+					
+					//The x,y components of new transmited ray.
 					Vector3 norm_x_inc = new Vector3();
 
 					norm_x_inc.cross(incDir,normal);
 
-					double sin_norm_inc = norm_x_inc.length();
+					double sinTheta1 = norm_x_inc.length();
 
-					//Create a ray in a in  the direction of transmission
-					Vector3 transDir = new Vector3(ray.direction);
+					double cosTheta2Sq = 1 - (1.0/1.6*sinTheta1); 
 
-					//Reorient the direction to have its base aligned to the tangent plane of the surface
-					iRec.frame.canonicalToFrame(transDir);
-
-					double x = transDir.x*sin_norm_inc;
-					double y = transDir.y*sin_norm_inc;
-					double z = transDir.z*sin_norm_inc;
-
-					//Vector3 normal = new vector(iRec.frame.w);
-
+					double x = transDir.x;
+					double y = transDir.y;
+					double z = Math.sqrt( (x*x + y*y)/(1.0/cosTheta2Sq -1.0 ));
+					z = transDir.z;
 					transDir.set(x,y,z);
-
-					iRec.frame.frameToCanonical(transDir);
 
 					//Create the ray emanating from the point of intersection oriented in the 
 					//direction of reflection.
@@ -444,10 +474,9 @@ public class PhotonMapRenderer implements Renderer {
 
 					//Cast the ray
 					rayRadiance(scene, transRay, sampler, sampleIndex, outColor);
-					//outColor.set(1.0,1.0,0.0);
 					return;
 				}
-					//Absorption
+					//AbsorptionrayRadiance
 				else{
 					//Ray dies
 				}

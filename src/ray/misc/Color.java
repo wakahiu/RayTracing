@@ -121,6 +121,15 @@ public class Color {
    * Scales each compoenent of this color by rhs.
    * @param rhs The scale value to use.
    */
+  public boolean eq(Color rhs) {
+  
+    return (this.r == rhs.r) && (this.g == rhs.g) && (this.b == rhs.g);
+  }
+
+  /**
+   * Scales each compoenent of this color by rhs.
+   * @param rhs The scale value to use.
+   */
   public void invScale(double rhs) {
 
     this.r /= rhs;

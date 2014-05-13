@@ -9,6 +9,7 @@ public class Photon{
 
 	public final Point3	position = new Point3();
 	public final Color	power = new Color();
+	public final Color refIdx = new Color(1.0,1.0,1.0);
 	public final Vector3 direction = new Vector3();
 
 	//No need for KDTree flag
@@ -17,6 +18,20 @@ public class Photon{
 
 	public Photon(Color pow){
 		this.power.set( pow );
+	}
+	//public final Point3 location = new 
+	public  void setRefIdx(Color idxNew){
+		this.refIdx.set(idxNew);
+	}
+
+	//public final Point3 location = new 
+	public  void resetRefIdx( ){
+		this.refIdx.set( new Color(1.0,1.0,1.0) );
+	}
+
+	//public final Point3 location = new 
+	public  Color getRefIdx(){
+		return this.refIdx;
 	}
 
 	//public final Point3 location = new 
