@@ -6,7 +6,7 @@
 
    <sampler type="JitteredSampler">
     <numSamplesU>1</numSamplesU>
-    <numSamplesV>2</numSamplesV>
+    <numSamplesV>1</numSamplesV>
   </sampler>
 
 
@@ -79,7 +79,7 @@
 
   <material name="chrome" type="Homogeneous">
     <bsdf type="Transluscent">
-      <specReflectance>0.999 0.999 0.999</specReflectance>
+      <specReflectance>0.99999 0.99999 0.99999</specReflectance>
       <diffReflectance>0.0 0.0 0.0</diffReflectance>
       <transmittance>0.0 0.0 0.0</transmittance>
     </bsdf>
@@ -138,12 +138,17 @@
     <material ref="cyan" />
     <center>278.0 262.0 0</center>
     <radius>0.0</radius>
-  </surface-->
+  </surface>
 
   <surface type="Sphere">
     <material ref="chrome" />
     <center>150.0 110.0 370</center>
     <radius>110.0</radius>
+  </surface-->
+
+  <surface type="Mesh">
+    <material ref="chrome" />
+    <data>torus.msh</data>
   </surface>
 
   <surface type="Sphere">

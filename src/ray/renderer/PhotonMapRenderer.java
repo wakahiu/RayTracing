@@ -422,6 +422,8 @@ public class PhotonMapRenderer implements Renderer {
 
 					//Castt 
 					rayRadiance(scene, specRay, sampler, sampleIndex, outColor);
+					outColor.set(1.0,0.5,1.0);
+					//outColor.scale(specReflectance);
 					return;
 					
 
