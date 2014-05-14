@@ -5,8 +5,8 @@
   </image>
 
    <sampler type="JitteredSampler">
-    <numSamplesU>5</numSamplesU>
-    <numSamplesV>5</numSamplesV>
+    <numSamplesU>1</numSamplesU>
+    <numSamplesV>1</numSamplesV>
   </sampler>
 
 
@@ -97,7 +97,7 @@
   <material name="light" type="LambertianEmitter">
     <bsdf type="Transluscent">
     </bsdf>
-    <radiance>4 4 4</radiance>
+    <radiance>0.95 0.95 0.95</radiance>
   </material>
 
 

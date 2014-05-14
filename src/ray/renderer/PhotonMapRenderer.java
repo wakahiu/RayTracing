@@ -471,6 +471,8 @@ public class PhotonMapRenderer implements Renderer {
 						Vector3 _n = new Vector3( n );
 						_n.scale(-1);
 
+						double eta_1 = ray.getRefIdx().r;
+						double eta_2 = transRay.getRefIdx().r;
 						//Get 
 						double eta_1__eta2 = (ray.getRefIdx().r)/(transRay.getRefIdx().r);
 						//System.out.println("eta " + eta_1__eta2);
@@ -486,7 +488,8 @@ public class PhotonMapRenderer implements Renderer {
 						double sinTheta1 = operand1.length();
 						if(sinTheta1 > 1.0/eta_1__eta2 ){
 							//Perform a total internal reflection
-							//Sid debug this.
+
+							//TODO Check if the ray ever exits here.
 
 							//Create a ray in  the direction of specular reflection
 							Vector3 reffDir = new Vector3(ray.direction);
@@ -503,14 +506,6 @@ public class PhotonMapRenderer implements Renderer {
 							iRec.frame.frameToCanonical(reffDir);
 							transmitDir.set(reffDir);
 							transRay.setRefIdx(refraciveIndex);
-
-							//transmitDir.set(ray.direction);
-							//transmitDir.scale(-1);
-
-							//outColor.set(1.0,0.3,1.0);
-							//transmitDir
-							//return;
-							//Sid end debug
 						}
 						else{
 
@@ -532,6 +527,49 @@ public class PhotonMapRenderer implements Renderer {
 
 							transmitDir.set(operand1);
 							transmitDir.sub(operand2);
+
+							n.normalize();
+							transmitDir.normalize();
+							//Fresnel's equation. A second russian roulette
+							double cosThetaI = _n.dot(ray.direction);
+							double cosThetaT = _n.dot(transmitDir);
+							double rFresnel = (eta_1*cosThetaI - eta_2*cosThetaT)/(eta_1*cosThetaI + eta_2*cosThetaT);
+							rFresnel *= rFresnel;
+
+							double rrFresnelRV = randGenerator.nextDouble();
+
+							// System.out.println(eta_1 + " " + eta_2);
+							// System.out.println(cosThetaI + " " + cosThetaT );
+							// System.out.println(eta_1*cosThetaI + " " + eta_2*cosThetaT );
+							// System.out.println(ray.direction.length() + " " + transmitDir.length() );
+							// System.out.println( rFresnel + "\n");
+
+							//Reflection instead of transmission
+							if( rrFresnelRV < rFresnel ){
+								//Create a ray in a in  the direction of specular reflection
+								Vector3 reffDir = new Vector3(ray.direction);
+
+								//Reorient the direction to have its base aligned to the tangent plane of the surface
+								iRec.frame.canonicalToFrame(reffDir);
+
+								double x = reffDir.x;
+								double y = reffDir.y;
+								double z = reffDir.z;
+
+								reffDir.set(x,y,-z);
+
+								iRec.frame.frameToCanonical(reffDir);
+
+								//Create the ray emainating from the point on intersection oriented in the 
+								//direction of reflection.
+								Ray specRay = new Ray(sri_point, reffDir);
+								specRay.makeOffsetRay();
+
+								//Castt 
+								rayRadiance(scene, specRay, sampler, sampleIndex, outColor);
+								return;
+							}
+
 						}
 						
 					}
@@ -559,7 +597,7 @@ public class PhotonMapRenderer implements Renderer {
 			}catch(KeySizeException ksze){
 				System.err.println("");
 			}
-			pow.scale(1.0/distSq*600000);
+			pow.scale(1.0/distSq*2400000);
 			outColor.set(outBSDFValue);
 			
 			outColor.scale(pow);
