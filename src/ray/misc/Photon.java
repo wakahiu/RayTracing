@@ -25,11 +25,14 @@ public class Photon{
 	}
 
 	//public final Point3 location = new 
+	public  void setPower(Color idxPow){
+		this.power.set(idxPow);
+	}
+
 	public  void resetRefIdx( ){
 		this.refIdx.set( new Color(1.0,1.0,1.0) );
 	}
 
-	//public final Point3 location = new 
 	public  Color getRefIdx(){
 		return this.refIdx;
 	}

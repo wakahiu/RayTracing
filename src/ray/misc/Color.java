@@ -123,7 +123,7 @@ public class Color {
    */
   public boolean eq(Color rhs) {
   
-    return (this.r == rhs.r) && (this.g == rhs.g) && (this.b == rhs.g);
+    return (this.r == rhs.r) && (this.g == rhs.g) && (this.b == rhs.b);
   }
 
   /**

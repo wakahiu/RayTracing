@@ -2,6 +2,7 @@ package ray.misc;
 
 import ray.math.Point3;
 import ray.math.Vector3;
+import ray.misc.Color;
 
 /**
  * A ray is simply an origin point and a direction vector.
@@ -16,6 +17,8 @@ public class Ray {
    * value across the ray tracer that stands for a "small amount".
    */
   public static final double EPSILON = 1e-6;
+
+  public final Color refIdx = new Color(1.0,1.0,1.0);
 
   /** The starting point of the ray. */
   public final Point3 origin = new Point3();
@@ -104,6 +107,18 @@ public class Ray {
     start = EPSILON;
     end = Double.POSITIVE_INFINITY;
 
+  }
+
+  public  void setRefIdx(Color idxNew){
+    this.refIdx.set(idxNew);
+  }
+
+  public  void resetRefIdx( ){
+    this.refIdx.set( new Color(1.0,1.0,1.0) );
+  }
+
+  public  Color getRefIdx(){
+    return this.refIdx;
   }
 
   /**

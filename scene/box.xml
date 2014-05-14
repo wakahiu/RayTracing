@@ -12,19 +12,19 @@
 
 
   <light type="PointLight">
-      <location>278.0 350.0 0.0</location>
+      <location>0.0 0.0 3.0</location>
       <power>0.95 0.95 0.95</power>
    </light>
 
   <renderer type="PhotonMapRenderer">
-    <photonsPerLight>100000</photonsPerLight>
+    <photonsPerLight>10000</photonsPerLight>
   </renderer>
 
 
 
   <camera>
-    <eye>278.0 253.0 -800.0</eye>
-    <target>278.0 253.0 0</target>
+    <eye>0.0 20.0 10.0</eye>
+    <target>0.0 0.0 0</target>
     <up>0 1 0</up>
     <yFOV>40</yFOV>
   </camera>
@@ -41,7 +41,7 @@
     <bsdf type="Transluscent">
       <specReflectance>0.05 0.0 0.0</specReflectance>
       <diffReflectance>0.65 0.0 0.0</diffReflectance>
-      <transmittance>0.005 0.005 0.005</transmittance>
+      <transmittance>0.05 0.05 0.05</transmittance>
     </bsdf>
   </material>
 
@@ -49,7 +49,7 @@
     <bsdf type="Transluscent">
       <specReflectance>0.0 0.05 0.0</specReflectance>
       <diffReflectance>0.0 0.65 0.0</diffReflectance>
-      <transmittance>0.005 0.005 0.005</transmittance>
+      <transmittance>0.05 0.05 0.05</transmittance>
     </bsdf>
   </material>
 
@@ -87,9 +87,9 @@
 
     <material name="glass" type="Homogeneous">
     <bsdf type="Transluscent">
-      <specReflectance>0.0 0.0 0.0</specReflectance>
-      <diffReflectance>0.0 0.0 0.0</diffReflectance>
-      <transmittance>0.99 0.99 0.99</transmittance>
+      <specReflectance>0.05 0.05 0.05</specReflectance>
+      <diffReflectance>0.01 0.01 0.01</diffReflectance>
+      <transmittance>0.93 0.93 0.93</transmittance>
       <refractiveIndex>1.62 1.61 1.60</refractiveIndex>
     </bsdf>
   </material>
@@ -100,10 +100,10 @@
     <radiance>260 260 260</radiance>
   </material>
 
-
+<!--
   <surface type="Mesh">
     <material ref="white" />
-    <data>cbox-noboxes.msh</data>
+    <data>cbox-white.msh</data>
   </surface>
 
   <surface type="Mesh">
@@ -111,6 +111,10 @@
     <data>cbox-red.msh</data>
   </surface>
 
+  <surface type="Mesh">
+    <material ref="yellow" />
+    <data>cbox-light.msh</data>
+  </surface>
 
   <surface type="Mesh">
     <material ref="light" />
@@ -122,7 +126,7 @@
     <data>cbox-green.msh</data>
   </surface>
 
-  <!--surface type="Sphere">
+  <surface type="Sphere">
     <material ref="light" />
     <center>308.0 260.0 0</center>
     <radius>20</radius>
@@ -138,18 +142,28 @@
     <material ref="cyan" />
     <center>278.0 262.0 0</center>
     <radius>0.0</radius>
-  </surface-->
-
-  <surface type="Sphere">
-    <material ref="chrome" />
-    <center>150.0 110.0 370</center>
-    <radius>110.0</radius>
   </surface>
 
   <surface type="Sphere">
-    <material ref="glass" />
-    <center>378.0 110.0 100</center>
-    <radius>110.0</radius>
+    <material ref="chrome" />
+    <center>300.0 432.0 370</center>
+    <radius>90.0</radius>
+  </surface>
+
+  <surface type="Sphere">
+    <material ref="cyan" />
+    <center>0.0 0.0 0</center>
+    <radius>1.0</radius>
+  </surface-->
+
+  <surface type="Mesh">
+    <material ref="green" />
+    <data>torus.msh</data>
+  </surface>
+
+  <surface type="Mesh">
+    <material ref="red" />
+    <data>box.mesh</data>
   </surface>
 
   <background type="Uniform">
