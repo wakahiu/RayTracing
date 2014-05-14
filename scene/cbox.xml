@@ -6,18 +6,18 @@
 
    <sampler type="JitteredSampler">
     <numSamplesU>1</numSamplesU>
-    <numSamplesV>1</numSamplesV>
+    <numSamplesV>2</numSamplesV>
   </sampler>
 
 
 
-  <light type="PointLight">
+  <!--light type="PointLight">
       <location>278.0 350.0 0.0</location>
       <power>0.95 0.95 0.95</power>
-   </light>
+   </light-->
 
   <renderer type="PhotonMapRenderer">
-    <photonsPerLight>100000</photonsPerLight>
+    <photonsPerLight>1000</photonsPerLight>
   </renderer>
 
 
@@ -97,7 +97,7 @@
   <material name="light" type="LambertianEmitter">
     <bsdf type="Transluscent">
     </bsdf>
-    <radiance>260 260 260</radiance>
+    <radiance>4 4 4</radiance>
   </material>
 
 
@@ -148,7 +148,7 @@
 
   <surface type="Sphere">
     <material ref="glass" />
-    <center>378.0 110.0 100</center>
+    <center>378.0 110.0 140</center>
     <radius>110.0</radius>
   </surface>
 

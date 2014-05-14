@@ -251,7 +251,7 @@ public class PhotonMapRenderer implements Renderer {
 							n.scale(-1);		//The normal points outside the material
 						}else{
 							//Entering the surface
-							transPhoton.power.scale(2);
+							//transPhoton.power.scale(1.1);
 							transPhoton.setRefIdx(refraciveIndex);
 						}
 
@@ -346,7 +346,7 @@ public class PhotonMapRenderer implements Renderer {
 		// find if the ray intersect with any surface
 		IntersectionRecord iRec = new IntersectionRecord();
 
-		int numNear = 50;
+		int numNear = 40;
 		
 		if (scene.getFirstIntersection(iRec, ray)) {
 			
@@ -438,6 +438,7 @@ public class PhotonMapRenderer implements Renderer {
 					Ray transRay = new Ray(sri_point, ray.direction);
 					transRay.makeOffsetRay();
 
+
 					//Query the refractive index in which the ray is propagating.
 					Color prevRefIdx = ray.getRefIdx();
 
@@ -455,10 +456,14 @@ public class PhotonMapRenderer implements Renderer {
 
 						Vector3 n = new Vector3(iRec.frame.w);
 
+						boolean exit = false;
 						if(prevRefIdx.eq(refraciveIndex) ){
 							//Exiting the surface
 							transRay.resetRefIdx();
 							n.scale(-1);		//The normal points outside the material
+							//outColor.set(0.0,0.0,1.0);		//Regions which reflect internally are shaded yellow for debug.
+							//return;
+							exit = true;
 
 						}else{
 							//Entering the surface
@@ -481,7 +486,7 @@ public class PhotonMapRenderer implements Renderer {
 
 						//Check the critical angle
 						double sinTheta1 = operand1.length();
-						if(sinTheta1 > 1/eta_1__eta2 ){
+						if(sinTheta1 > 1/eta_1__eta2 && false){
 							//Perform a total internal reflection
 							//Sid debug this.
 
@@ -493,17 +498,16 @@ public class PhotonMapRenderer implements Renderer {
 
 							double x = reffDir.x;
 							double y = reffDir.y;
-							double z = reffDir.z;
+							double z = -reffDir.z;
 
-							reffDir.set(x,y,-z);
+							reffDir.set(x,y,z);
 
 							iRec.frame.frameToCanonical(reffDir);
 							transmitDir.set(reffDir);
 							transRay.setRefIdx(refraciveIndex);
-							ray.direction.scale(-1);
-							transmitDir.set( ray.direction );
-							outColor.set(1.0,1.0,0.0);		//Regions which reflect internally are shaded yellow for debug.
-							return;
+
+							transmitDir.set(ray.direction);
+							transmitDir.scale(-1);
 							//Sid end debug
 						}
 						else{
@@ -530,7 +534,7 @@ public class PhotonMapRenderer implements Renderer {
 						
 					}
 
-					ray.direction.set(transmitDir);
+					transRay.makeOffsetRay();
 					//Cast the ray
 					rayRadiance(scene, transRay, sampler, sampleIndex, outColor);
 					return;
@@ -552,7 +556,7 @@ public class PhotonMapRenderer implements Renderer {
 			}catch(KeySizeException ksze){
 				System.err.println("");
 			}
-			pow.scale(1.0/distSq*9000);
+			pow.scale(1.0/distSq*600000);
 			outColor.set(outBSDFValue);
 			
 			outColor.scale(pow);
