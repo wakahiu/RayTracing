@@ -487,11 +487,11 @@ public class PhotonMapRenderer implements Renderer {
 
 						//Check the critical angle
 						double sinTheta1 = operand1.length();
-						if(sinTheta1 > 1/eta_1__eta2 && false){
+						if(sinTheta1 > 1.0/eta_1__eta2 ){
 							//Perform a total internal reflection
 							//Sid debug this.
 
-							//Create a ray in a in  the direction of specular reflection
+							//Create a ray in  the direction of specular reflection
 							Vector3 reffDir = new Vector3(ray.direction);
 
 							//Reorient the direction to have its base aligned to the tangent plane of the surface
@@ -509,6 +509,10 @@ public class PhotonMapRenderer implements Renderer {
 
 							transmitDir.set(ray.direction);
 							transmitDir.scale(-1);
+
+							//outColor.set(1.0,0.3,1.0);
+							//transmitDir
+							//return;
 							//Sid end debug
 						}
 						else{
@@ -535,6 +539,7 @@ public class PhotonMapRenderer implements Renderer {
 						
 					}
 
+					transRay.direction.set(transmitDir);
 					transRay.makeOffsetRay();
 					//Cast the ray
 					rayRadiance(scene, transRay, sampler, sampleIndex, outColor);
