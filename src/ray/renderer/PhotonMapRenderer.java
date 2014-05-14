@@ -457,14 +457,10 @@ public class PhotonMapRenderer implements Renderer {
 
 						Vector3 n = new Vector3(iRec.frame.w);
 
-						boolean exit = false;
 						if(prevRefIdx.eq(refraciveIndex) ){
 							//Exiting the surface
 							transRay.resetRefIdx();
 							n.scale(-1);		//The normal points outside the material
-							//outColor.set(0.0,0.0,1.0);		//Regions which reflect internally are shaded yellow for debug.
-							//return;
-							exit = true;
 
 						}else{
 							//Entering the surface
@@ -476,7 +472,8 @@ public class PhotonMapRenderer implements Renderer {
 						_n.scale(-1);
 
 						//Get 
-						double eta_1__eta2 = ray.getRefIdx().r/transRay.getRefIdx().r;
+						double eta_1__eta2 = (ray.getRefIdx().r)/(transRay.getRefIdx().r);
+						//System.out.println("eta " + eta_1__eta2);
 						double eta1__eta2_2 = eta_1__eta2 * eta_1__eta2;
 
 						Vector3 s= new Vector3(ray.direction);
@@ -499,16 +496,16 @@ public class PhotonMapRenderer implements Renderer {
 
 							double x = reffDir.x;
 							double y = reffDir.y;
-							double z = -reffDir.z;
+							double z = reffDir.z;
 
-							reffDir.set(x,y,z);
+							reffDir.set(x,y,-z);
 
 							iRec.frame.frameToCanonical(reffDir);
 							transmitDir.set(reffDir);
 							transRay.setRefIdx(refraciveIndex);
 
-							transmitDir.set(ray.direction);
-							transmitDir.scale(-1);
+							//transmitDir.set(ray.direction);
+							//transmitDir.scale(-1);
 
 							//outColor.set(1.0,0.3,1.0);
 							//transmitDir

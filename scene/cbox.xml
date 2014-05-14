@@ -5,8 +5,8 @@
   </image>
 
    <sampler type="JitteredSampler">
-    <numSamplesU>1</numSamplesU>
-    <numSamplesV>1</numSamplesV>
+    <numSamplesU>5</numSamplesU>
+    <numSamplesV>5</numSamplesV>
   </sampler>
 
 
@@ -147,13 +147,19 @@
 
   <surface type="Sphere">
     <material ref="chrome" />
-    <center>150.0 180.0 370</center>
+    <center>350.0 280.0 370</center>
     <radius>110.0</radius>
   </surface>
 
   <surface type="Sphere">
     <material ref="glass" />
-    <center>378.0 110.0 140</center>
+    <center>158.0 110.0 140</center>
+    <radius>110.0</radius>
+  </surface>
+
+    <surface type="Sphere">
+    <material ref="glass" />
+    <center>398.0 110.0 140</center>
     <radius>110.0</radius>
   </surface>
 
