@@ -220,9 +220,6 @@ public class PhotonMapRenderer implements Renderer {
 					
 				}
 					//Transmission
-					//
-					//
-					/// Sid play with this
 				else if(russianRouletteRV<(pSpec+pDiff+pTrans)){
 
 					
@@ -235,9 +232,6 @@ public class PhotonMapRenderer implements Renderer {
 					//Query the refractive index in which the photon is propagating.
 					Color prevRefIdx = photon.getRefIdx();
 					Photon transPhoton = new Photon( outPower );
-
-					//Sid part -- debug
-
 
 					//reference: http://www.starkeffects.com/snells-law-vector.shtml
 					
@@ -294,7 +288,7 @@ public class PhotonMapRenderer implements Renderer {
 						transmitDir.sub(operand2);
 						
 					}
-					//Sid part ends
+					//part ends
 					/*
 					//Reorient the direction to have its base aligned to the tangent plane of the surface
 					Vector3 normal = new Vector3(iRec.frame.w);
@@ -318,7 +312,7 @@ public class PhotonMapRenderer implements Renderer {
 					}
 					*/
 					//Cast another ray in a random direction in the hemisphere above the surface.
-					//Ray transRay = new Ray(sri_point, transDir); //Sid comment : May 13
+					//Ray transRay = new Ray(sri_point, transDir); //Chandra comment : May 13
 					Ray transRay = new Ray(sri_point, transmitDir);
 					transRay.makeOffsetRay();
 					
@@ -447,7 +441,6 @@ public class PhotonMapRenderer implements Renderer {
 					//Query the refractive index in which the ray is propagating.
 					Color prevRefIdx = ray.getRefIdx();
 
-					//Sid part -- debug
 
 
 					//reference: http://www.starkeffects.com/snells-law-vector.shtml
@@ -490,6 +483,7 @@ public class PhotonMapRenderer implements Renderer {
 						double sinTheta1 = operand1.length();
 						if(sinTheta1 > 1/eta_1__eta2 ){
 							//Perform a total internal reflection
+							//Sid debug this.
 
 							//Create a ray in a in  the direction of specular reflection
 							Vector3 reffDir = new Vector3(ray.direction);
@@ -506,8 +500,11 @@ public class PhotonMapRenderer implements Renderer {
 							iRec.frame.frameToCanonical(reffDir);
 							transmitDir.set(reffDir);
 							transRay.setRefIdx(refraciveIndex);
-							//outColor.set(1.0,1.0,0.0);
-							//return;
+							ray.direction.scale(-1);
+							transmitDir.set( ray.direction );
+							outColor.set(1.0,1.0,0.0);		//Regions which reflect internally are shaded yellow for debug.
+							return;
+							//Sid end debug
 						}
 						else{
 
@@ -536,6 +533,7 @@ public class PhotonMapRenderer implements Renderer {
 					ray.direction.set(transmitDir);
 					//Cast the ray
 					rayRadiance(scene, transRay, sampler, sampleIndex, outColor);
+					outColor.set(1.0,1.0,0.0);
 					return;
 				}
 					//AbsorptionrayRadiance
